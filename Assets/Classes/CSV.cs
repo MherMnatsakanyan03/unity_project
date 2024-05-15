@@ -33,7 +33,17 @@ public class CSV : MonoBehaviour
         public void AddTemp(double temp)
         {
             total_temp += temp;
-            avg_temp = total_temp / count;
+            avg_temp = Math.Round(total_temp / count, 2);
+        }
+
+        public double GetAvgTemp()
+        {
+            return avg_temp;
+        }
+
+        public int GetCount()
+        {
+            return count;
         }
     }
 
@@ -127,18 +137,36 @@ public class CSV : MonoBehaviour
 
         public void PrintData()
         {
+            string log = "";
             foreach (var year in years)
             {
-                Debug.Log(year.year);
+                log += "Year: " + year.year + "\n";
                 foreach (var building_class in year.GetBuildingClasses())
                 {
-                    Debug.Log("\t" + building_class.class_name);
+                    log += "\t" + building_class.class_name + "\n";
                     foreach (var facility in building_class.GetFacilities())
                     {
-                        Debug.Log("\t\t" + facility.facility_type);
+                        log +=
+                            "\t\t"
+                            + facility.facility_type
+                            + (
+                                facility.facility_type.Length > 6
+                                    ? ",\t\t avg Temp: "
+                                    : ",\t\t\t avg Temp: "
+                            )
+                            + facility.GetAvgTemp().ToString()
+                            + (
+                                facility.GetAvgTemp().ToString().Length > 3
+                                    ? ",\t count: "
+                                    : ",\t\t count: "
+                            )
+                            + facility.GetCount().ToString()
+                            + "\n";
                     }
                 }
             }
+
+            Debug.Log(log);
         }
 
         private void ReadCSV()
@@ -188,12 +216,12 @@ public class CSV : MonoBehaviour
                                 index_passed_facility
                             ];
                             current_facility_obj.IncrementCount();
-                            current_facility_obj.AddTemp(double.Parse(avg_temp));
+                            current_facility_obj.AddTemp(ParseTemp(avg_temp));
                         }
                         // Else, add the facility to the existing building class
                         else
                         {
-                            var facility_obj = new Facility(facility_type, double.Parse(avg_temp));
+                            var facility_obj = new Facility(facility_type, ParseTemp(avg_temp));
                             current_class_obj.AddFacilityName(facility_type);
                             current_class_obj.AddFacility(facility_obj);
                         }
@@ -202,7 +230,7 @@ public class CSV : MonoBehaviour
                     else
                     {
                         var building_class_obj = new Building_Class(building_class);
-                        var facility_obj = new Facility(facility_type, double.Parse(avg_temp));
+                        var facility_obj = new Facility(facility_type, ParseTemp(avg_temp));
 
                         building_class_obj.AddFacilityName(facility_type);
                         building_class_obj.AddFacility(facility_obj);
@@ -217,7 +245,7 @@ public class CSV : MonoBehaviour
                     passed_years.Add(year.ToString());
                     var year_obj = new Year(year);
                     var building_class_obj = new Building_Class(building_class);
-                    var facility_obj = new Facility(facility_type, double.Parse(avg_temp));
+                    var facility_obj = new Facility(facility_type, ParseTemp(avg_temp));
 
                     building_class_obj.AddFacilityName(facility_type);
                     building_class_obj.AddFacility(facility_obj);
@@ -229,6 +257,11 @@ public class CSV : MonoBehaviour
             }
 
             reader.Close();
+        }
+
+        private double ParseTemp(string temp)
+        {
+            return double.Parse(temp.Split('.')[0]);
         }
     }
 }
