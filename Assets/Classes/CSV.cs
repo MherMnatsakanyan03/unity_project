@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using Facility = City.Facility;
+using Building_Class = City.Building_Class;
+using Year = City.Year;
 
 public class CSV : MonoBehaviour
 {
@@ -10,110 +13,6 @@ public class CSV : MonoBehaviour
     {
         CSVReader reader = new();
         reader.PrintData();
-    }
-
-    public class Facility
-    {
-        public string facility_type;
-        private double total_temp = 0;
-        private double avg_temp = 0;
-        private int count = 1;
-
-        public Facility(string facility_type, double temp)
-        {
-            this.facility_type = facility_type;
-            total_temp += temp;
-        }
-
-        public void IncrementCount()
-        {
-            count++;
-        }
-
-        public void AddTemp(double temp)
-        {
-            total_temp += temp;
-            avg_temp = Math.Round(total_temp / count, 2);
-        }
-
-        public double GetAvgTemp()
-        {
-            return avg_temp;
-        }
-
-        public int GetCount()
-        {
-            return count;
-        }
-    }
-
-    public class Building_Class
-    {
-        public string class_name;
-        private readonly List<string> facilities_names = new();
-        private readonly List<Facility> facilities = new();
-
-        public Building_Class(string class_name)
-        {
-            this.class_name = class_name;
-        }
-
-        public void AddFacility(Facility facility)
-        {
-            facilities.Add(facility);
-        }
-
-        public List<Facility> GetFacilities()
-        {
-            return facilities;
-        }
-
-        public List<string> GetFacilitiesNames()
-        {
-            return facilities_names;
-        }
-
-        public void AddFacilityName(string name)
-        {
-            facilities_names.Add(name);
-        }
-    }
-
-    public class Year
-    {
-        public int year;
-        private readonly List<string> building_classes_names = new();
-        private readonly List<Building_Class> building_classes = new();
-
-        public Year(int year)
-        {
-            this.year = year;
-        }
-
-        public Year(string year)
-        {
-            this.year = int.Parse(year);
-        }
-
-        public void AddBuildingClass(Building_Class building_class)
-        {
-            building_classes.Add(building_class);
-        }
-
-        public List<Building_Class> GetBuildingClasses()
-        {
-            return building_classes;
-        }
-
-        public List<string> GetBuildingClassesNames()
-        {
-            return building_classes_names;
-        }
-
-        public void AddBuildingClassName(string name)
-        {
-            building_classes_names.Add(name);
-        }
     }
 
     public class CSVReader
@@ -258,7 +157,7 @@ public class CSV : MonoBehaviour
 
             reader.Close();
         }
-
+   
         private double ParseTemp(string temp)
         {
             return double.Parse(temp.Split('.')[0]);
