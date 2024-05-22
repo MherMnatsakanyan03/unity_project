@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace City
+namespace CityData
 {
     public class Year
     {

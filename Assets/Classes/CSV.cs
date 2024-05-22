@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using Facility = City.Facility;
-using Building_Class = City.Building_Class;
-using Year = City.Year;
+using Facility = CityData.Facility;
+using Building_Class = CityData.Building_Class;
+using Year = CityData.Year;
 
 public class CSV : MonoBehaviour
 {

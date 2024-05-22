@@ -1,6 +1,6 @@
 using System;
 
-namespace City
+namespace CityData
 {
     public class Facility
     {
