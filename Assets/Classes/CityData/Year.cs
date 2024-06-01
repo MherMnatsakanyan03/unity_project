@@ -37,5 +37,34 @@ namespace CityData
         {
             building_classes_names.Add(name);
         }
+
+        public void printYearData()
+        {
+            string log = "Year: " + year + "\n";
+            foreach (var building_class in building_classes)
+            {
+                log += "\t" + building_class.class_name + "\n";
+                foreach (var facility in building_class.GetFacilities())
+                {
+                    log +=
+                        "\t\t"
+                        + facility.facility_type
+                        + (
+                            facility.facility_type.Length > 6
+                                ? ",\t\t avg Temp: "
+                                : ",\t\t\t avg Temp: "
+                        )
+                        + facility.GetAvgTemp().ToString()
+                        + (
+                            facility.GetAvgTemp().ToString().Length > 3
+                                ? ",\t count: "
+                                : ",\t\t count: "
+                        )
+                        + facility.GetCount().ToString()
+                        + "\n";
+                }
+            }
+            UnityEngine.Debug.Log(log);
+        }
     }
 }

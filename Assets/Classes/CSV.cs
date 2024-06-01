@@ -2,18 +2,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using Facility = CityData.Facility;
 using Building_Class = CityData.Building_Class;
+using Facility = CityData.Facility;
 using Year = CityData.Year;
 
-public class CSV : MonoBehaviour
+namespace CityData
 {
-    private void Start()
-    {
-        CSVReader reader = new();
-        reader.PrintData();
-    }
-
     public class CSVReader
     {
         private readonly string path = "Data/data.csv";
@@ -33,35 +27,17 @@ public class CSV : MonoBehaviour
             ReadCSV();
         }
 
+        public List<Year> GetYears()
+        {
+            return years;
+        }
+
         public void PrintData()
         {
             string log = "";
             foreach (var year in years)
             {
-                log += "Year: " + year.year + "\n";
-                foreach (var building_class in year.GetBuildingClasses())
-                {
-                    log += "\t" + building_class.class_name + "\n";
-                    foreach (var facility in building_class.GetFacilities())
-                    {
-                        log +=
-                            "\t\t"
-                            + facility.facility_type
-                            + (
-                                facility.facility_type.Length > 6
-                                    ? ",\t\t avg Temp: "
-                                    : ",\t\t\t avg Temp: "
-                            )
-                            + facility.GetAvgTemp().ToString()
-                            + (
-                                facility.GetAvgTemp().ToString().Length > 3
-                                    ? ",\t count: "
-                                    : ",\t\t count: "
-                            )
-                            + facility.GetCount().ToString()
-                            + "\n";
-                    }
-                }
+                year.printYearData();
             }
 
             Debug.Log(log);
@@ -71,7 +47,6 @@ public class CSV : MonoBehaviour
         {
             StreamReader reader = new(path);
             string line = reader.ReadLine();
-            Debug.Log(line);
             headers = line.Split(',').OfType<string>().ToList();
 
             csv_index_year = headers.IndexOf("Year_Factor");
@@ -156,7 +131,7 @@ public class CSV : MonoBehaviour
 
             reader.Close();
         }
-   
+
         private double ParseTemp(string temp)
         {
             return double.Parse(temp.Split('.')[0]);
