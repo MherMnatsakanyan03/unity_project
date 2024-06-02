@@ -5,8 +5,8 @@ namespace CityData
     public class Year
     {
         public int year;
-        private readonly List<string> building_classes_names = new();
-        private readonly List<Building_Class> building_classes = new();
+        private readonly List<int> city_ids = new();
+        private readonly List<CityObj> cities = new();
 
         public Year(int year)
         {
@@ -18,53 +18,29 @@ namespace CityData
             this.year = int.Parse(year);
         }
 
-        public void AddBuildingClass(Building_Class building_class)
+        public void AddCity(CityObj city)
         {
-            building_classes.Add(building_class);
+            cities.Add(city);
         }
 
-        public List<Building_Class> GetBuildingClasses()
+        public void AddCityId(int id)
         {
-            return building_classes;
+            city_ids.Add(id);
         }
 
-        public List<string> GetBuildingClassesNames()
+        public void PrintYear()
         {
-            return building_classes_names;
+            UnityEngine.Debug.Log("Current Year: " + year);
         }
 
-        public void AddBuildingClassName(string name)
+        public List<CityObj> GetCities()
         {
-            building_classes_names.Add(name);
+            return cities;
         }
 
-        public void printYearData()
+        public List<int> GetCityIds()
         {
-            string log = "Year: " + year + "\n";
-            foreach (var building_class in building_classes)
-            {
-                log += "\t" + building_class.class_name + "\n";
-                foreach (var facility in building_class.GetFacilities())
-                {
-                    log +=
-                        "\t\t"
-                        + facility.facility_type
-                        + (
-                            facility.facility_type.Length > 6
-                                ? ",\t\t avg Temp: "
-                                : ",\t\t\t avg Temp: "
-                        )
-                        + facility.GetAvgTemp().ToString()
-                        + (
-                            facility.GetAvgTemp().ToString().Length > 3
-                                ? ",\t count: "
-                                : ",\t\t count: "
-                        )
-                        + facility.GetCount().ToString()
-                        + "\n";
-                }
-            }
-            UnityEngine.Debug.Log(log);
+            return city_ids;
         }
     }
 }

@@ -55,7 +55,7 @@ public class UI : MonoBehaviour
         if (currentYearIndex < years.Count - 1)
         {
             currentYearIndex++;
-            years[currentYearIndex].printYearData();
+            years[currentYearIndex].PrintYear();
         }
     }
 
@@ -67,7 +67,7 @@ public class UI : MonoBehaviour
         if (currentYearIndex > 0)
         {
             currentYearIndex--;
-            years[currentYearIndex].printYearData();
+            years[currentYearIndex].PrintYear();
         }
     }
 
@@ -124,7 +124,7 @@ public class UI : MonoBehaviour
     {
         // Load Data
         csvReader = new CSVReader();
-        years = csvReader.GetYears();
+        years = csvReader.GetData();
     }
 
     /**
