@@ -36,6 +36,9 @@ namespace CityData
             return years;
         }
 
+        /**
+         * Print the data in the console
+         */
         public void PrintData()
         {
             string log = "";
@@ -94,6 +97,12 @@ namespace CityData
             Debug.Log(log);
         }
 
+        /* ==================================================== Functions =================================================== */
+
+        /**
+         * Read the CSV file and store the data in the years, cities, building classes, and facilities
+         * Includes some pre-processing to calculate things
+         */
         private void ReadCSV()
         {
             // measure the time taken to read the CSV file
@@ -111,6 +120,7 @@ namespace CityData
             csv_index_avg_temp = headers.IndexOf("avg_temp");
             csv_index_area = headers.IndexOf("floor_area");
 
+            // Initialize the years, cities, building classes, and facilities
             while (!reader.EndOfStream)
             {
                 line = reader.ReadLine();
@@ -267,11 +277,17 @@ namespace CityData
             Debug.Log("Time taken to read the CSV file: " + stopwatch.ElapsedMilliseconds + "ms");
         }
 
+        /**
+         * Parse the temperature and area values from the CSV file
+         */
         private double ParseTemp(string temp)
         {
             return double.Parse(temp.Split('.')[0]);
         }
 
+        /**
+         * Parse the area values from the CSV file
+         */
         private ulong ParseArea(string area)
         {
             area = area.Split('.')[0];
