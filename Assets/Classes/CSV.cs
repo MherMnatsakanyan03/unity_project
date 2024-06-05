@@ -2,29 +2,22 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using Facility = City.Facility;
-using Building_Class = City.Building_Class;
-using Year = City.Year;
 
-public class CSV : MonoBehaviour
+namespace CityData
 {
-    private void Start()
-    {
-        CSVReader reader = new();
-        reader.PrintData();
-    }
-
-    public class CSVReader
+    public class CSVReader : MonoBehaviour
     {
         private readonly string path = "Data/data.csv";
         private List<string> headers = new();
         private readonly List<string> passed_years = new();
 
         // Indexes of the columns in the CSV file
-        private int csv_index_year;
-        private int csv_index_class;
-        private int csv_index_facility;
-        private int csv_index_avg_temp;
+        private int csv_index_year,
+            csv_index_city,
+            csv_index_class,
+            csv_index_facility,
+            csv_index_avg_temp,
+            csv_index_area;
 
         private readonly List<Year> years = new();
 
@@ -33,61 +26,112 @@ public class CSV : MonoBehaviour
             ReadCSV();
         }
 
+        public void Start()
+        {
+            PrintData();
+        }
+
+        public List<Year> GetData()
+        {
+            return years;
+        }
+
+        /**
+         * Print the data in the console
+         */
         public void PrintData()
         {
             string log = "";
             foreach (var year in years)
             {
                 log += "Year: " + year.year + "\n";
-                foreach (var building_class in year.GetBuildingClasses())
+                var cities = year.GetCities();
+                foreach (var city in cities)
                 {
-                    log += "\t" + building_class.class_name + "\n";
-                    foreach (var facility in building_class.GetFacilities())
+                    log +=
+                        "\tCity: "
+                        + city.city_id
+                        + ", Area: "
+                        + city.GetArea().ToString()
+                        + ", Buildings: "
+                        + city.GetBuildingCount().ToString()
+                        + "\n";
+                    var building_classes = city.GetBuildingClasses();
+                    foreach (var building_class in building_classes)
                     {
-                        log +=
-                            "\t\t"
-                            + facility.facility_type
-                            + (
-                                facility.facility_type.Length > 6
-                                    ? ",\t\t avg Temp: "
-                                    : ",\t\t\t avg Temp: "
-                            )
-                            + facility.GetAvgTemp().ToString()
-                            + (
-                                facility.GetAvgTemp().ToString().Length > 3
-                                    ? ",\t count: "
-                                    : ",\t\t count: "
-                            )
-                            + facility.GetCount().ToString()
-                            + "\n";
+                        log += "\t\t" + building_class.class_name + "\n";
+                        foreach (var facility in building_class.GetFacilities())
+                        {
+                            log +=
+                                "\t\t\t"
+                                + facility.facility_type
+                                + (
+                                    facility.facility_type.Length > 6
+                                        ? ",\t\t avg Temp: "
+                                        : ",\t\t\t avg Temp: "
+                                )
+                                + facility.GetAvgTemp().ToString()
+                                + (
+                                    facility.GetAvgTemp().ToString().Length > 3
+                                        ? ",\t count: "
+                                        : ",\t\t count: "
+                                )
+                                + facility.GetCount().ToString()
+                                + "\t Total Area:"
+                                + facility.GetTotalArea().ToString()
+                                + "\t Small: "
+                                + facility.GetCountPart(1).ToString()
+                                + "\t Medium: "
+                                + facility.GetCountPart(2).ToString()
+                                + "\t Large: "
+                                + facility.GetCountPart(3).ToString()
+                                + "\t Size Thresholds: "
+                                + facility.GetUpperSizeToBeSmall().ToString()
+                                + ", "
+                                + facility.GetUpperSizeToBeMedium().ToString()
+                                + "\n";
+                        }
                     }
                 }
             }
-
             Debug.Log(log);
         }
 
+        /* ==================================================== Functions =================================================== */
+
+        /**
+         * Read the CSV file and store the data in the years, cities, building classes, and facilities
+         * Includes some pre-processing to calculate things
+         */
         private void ReadCSV()
         {
+            // measure the time taken to read the CSV file
+            System.Diagnostics.Stopwatch stopwatch = new();
+            stopwatch.Start();
+
             StreamReader reader = new(path);
             string line = reader.ReadLine();
-            Debug.Log(line);
             headers = line.Split(',').OfType<string>().ToList();
 
             csv_index_year = headers.IndexOf("Year_Factor");
+            csv_index_city = headers.IndexOf("State_Factor");
             csv_index_class = headers.IndexOf("building_class");
             csv_index_facility = headers.IndexOf("facility_type");
             csv_index_avg_temp = headers.IndexOf("avg_temp");
+            csv_index_area = headers.IndexOf("floor_area");
 
+            // Initialize the years, cities, building classes, and facilities
             while (!reader.EndOfStream)
             {
                 line = reader.ReadLine();
                 string[] values = line.Split(',');
 
                 var year = values[csv_index_year];
+                var city_id = int.Parse(values[csv_index_city].Split('_').Last()); // Get the last character of the string
                 var building_class = values[csv_index_class];
                 var facility_type = values[csv_index_facility];
-                var avg_temp = values[csv_index_avg_temp];
+                var avg_temp = ParseTemp(values[csv_index_avg_temp]);
+                var area = ParseArea(values[csv_index_area]);
 
                 int index_passed_year = passed_years.IndexOf(year);
 
@@ -95,45 +139,67 @@ public class CSV : MonoBehaviour
                 if (index_passed_year != -1)
                 {
                     var current_year_obj = years[index_passed_year];
-                    var passed_classes = current_year_obj.GetBuildingClassesNames();
-                    var index_passed_class = passed_classes.IndexOf(building_class);
-
-                    // If the building class has been checked before
-                    if (index_passed_class != -1)
+                    var passed_cities = current_year_obj.GetCityIds();
+                    var index_passed_city = passed_cities.IndexOf(city_id);
+                    // If the city has been checked before
+                    if (index_passed_city != -1)
                     {
-                        var current_class_obj = current_year_obj.GetBuildingClasses()[
-                            index_passed_class
-                        ];
-                        var passed_facilities = current_class_obj.GetFacilitiesNames();
-                        var index_passed_facility = passed_facilities.IndexOf(facility_type);
-
-                        // If the facility has been checked before
-                        if (index_passed_facility != -1)
+                        var current_city_obj = current_year_obj.GetCities()[index_passed_city];
+                        current_city_obj.AddArea(area);
+                        current_city_obj.IncrementBuildingCount();
+                        var passed_classes = current_city_obj.GetBuildingClassesNames();
+                        var index_passed_class = passed_classes.IndexOf(building_class);
+                        // If the building class has been checked before
+                        if (index_passed_class != -1)
                         {
-                            var current_facility_obj = current_class_obj.GetFacilities()[
-                                index_passed_facility
+                            var current_class_obj = current_city_obj.GetBuildingClasses()[
+                                index_passed_class
                             ];
-                            current_facility_obj.IncrementCount();
-                            current_facility_obj.AddTemp(ParseTemp(avg_temp));
+                            var passed_facilities = current_class_obj.GetFacilitiesNames();
+                            var index_passed_facility = passed_facilities.IndexOf(facility_type);
+
+                            // If the facility has been checked before
+                            if (index_passed_facility != -1)
+                            {
+                                var current_facility_obj = current_class_obj.GetFacilities()[
+                                    index_passed_facility
+                                ];
+                                current_facility_obj.IncrementCount();
+                                current_facility_obj.AddTemp(avg_temp);
+                                current_facility_obj.AddArea(area);
+                            }
+                            // Else, add the facility to the existing building class
+                            else
+                            {
+                                var facility_obj = new Facility(facility_type, avg_temp, area);
+                                current_class_obj.AddFacilityName(facility_type);
+                                current_class_obj.AddFacility(facility_obj);
+                            }
                         }
-                        // Else, add the facility to the existing building class
+                        // Else, add the building class and facility to the existing year
                         else
                         {
-                            var facility_obj = new Facility(facility_type, ParseTemp(avg_temp));
-                            current_class_obj.AddFacilityName(facility_type);
-                            current_class_obj.AddFacility(facility_obj);
+                            var building_class_obj = new Building_Class(building_class);
+                            var facility_obj = new Facility(facility_type, avg_temp, area);
+
+                            building_class_obj.AddFacilityName(facility_type);
+                            building_class_obj.AddFacility(facility_obj);
+                            current_city_obj.AddBuildingClassName(building_class);
+                            current_city_obj.AddBuildingClass(building_class_obj);
                         }
                     }
-                    // Else, add the building class and facility to the existing year
                     else
                     {
+                        var city_obj = new CityObj(city_id, area);
                         var building_class_obj = new Building_Class(building_class);
-                        var facility_obj = new Facility(facility_type, ParseTemp(avg_temp));
+                        var facility_obj = new Facility(facility_type, avg_temp, area);
 
                         building_class_obj.AddFacilityName(facility_type);
                         building_class_obj.AddFacility(facility_obj);
-                        current_year_obj.AddBuildingClassName(building_class);
-                        current_year_obj.AddBuildingClass(building_class_obj);
+                        city_obj.AddBuildingClassName(building_class);
+                        city_obj.AddBuildingClass(building_class_obj);
+                        current_year_obj.AddCity(city_obj);
+                        current_year_obj.AddCityId(city_id);
                     }
                 }
                 // Else, add the year to the array and add the building class and facility
@@ -142,24 +208,90 @@ public class CSV : MonoBehaviour
                 {
                     passed_years.Add(year.ToString());
                     var year_obj = new Year(year);
+                    var city_obj = new CityObj(city_id, area);
                     var building_class_obj = new Building_Class(building_class);
-                    var facility_obj = new Facility(facility_type, ParseTemp(avg_temp));
+                    var facility_obj = new Facility(facility_type, avg_temp, area);
 
                     building_class_obj.AddFacilityName(facility_type);
                     building_class_obj.AddFacility(facility_obj);
-                    year_obj.AddBuildingClassName(building_class);
-                    year_obj.AddBuildingClass(building_class_obj);
-
+                    city_obj.AddBuildingClassName(building_class);
+                    city_obj.AddBuildingClass(building_class_obj);
+                    year_obj.AddCity(city_obj);
+                    year_obj.AddCityId(city_id);
                     years.Add(year_obj);
                 }
             }
+            reader.Close();
+
+            // Set the size thresholds for each facility
+            foreach (Year year in years)
+            {
+                foreach (CityObj city in year.GetCities())
+                {
+                    foreach (Building_Class building_class in city.GetBuildingClasses())
+                    {
+                        foreach (Facility facility in building_class.GetFacilities())
+                        {
+                            facility.SetSizeThresholds();
+                        }
+                    }
+                }
+            }
+
+            reader = new(path);
+            reader.ReadLine(); // Skip the headers
+
+            //  re-run to count the number of small, medium, and large facilities
+            while (!reader.EndOfStream)
+            {
+                line = reader.ReadLine();
+                string[] values = line.Split(',');
+
+                var year = values[csv_index_year];
+                var city_id = int.Parse(values[csv_index_city].Split('_').Last()); // Get the last character of the string
+                var building_class = values[csv_index_class];
+                var facility_type = values[csv_index_facility];
+                var area = ParseArea(values[csv_index_area]);
+
+                int index_passed_year = passed_years.IndexOf(year);
+                var current_year_obj = years[index_passed_year];
+
+                var passed_cities = current_year_obj.GetCityIds();
+                var index_passed_city = passed_cities.IndexOf(city_id);
+                var current_city_obj = current_year_obj.GetCities()[index_passed_city];
+
+                var passed_classes = current_city_obj.GetBuildingClassesNames();
+                var index_passed_class = passed_classes.IndexOf(building_class);
+                var current_class_obj = current_city_obj.GetBuildingClasses()[index_passed_class];
+
+                var passed_facilities = current_class_obj.GetFacilitiesNames();
+                var index_passed_facility = passed_facilities.IndexOf(facility_type);
+                var current_facility_obj = current_class_obj.GetFacilities()[index_passed_facility];
+
+                current_facility_obj.IncrementPartCount(area);
+            }
 
             reader.Close();
+
+            stopwatch.Stop();
+            Debug.Log("Time taken to read the CSV file: " + stopwatch.ElapsedMilliseconds + "ms");
         }
-   
+
+        /**
+         * Parse the temperature and area values from the CSV file
+         */
         private double ParseTemp(string temp)
         {
             return double.Parse(temp.Split('.')[0]);
+        }
+
+        /**
+         * Parse the area values from the CSV file
+         */
+        private ulong ParseArea(string area)
+        {
+            area = area.Split('.')[0];
+            return ulong.Parse(area);
         }
     }
 }
