@@ -213,39 +213,20 @@ namespace CityData
             }
             reader.Close();
 
-            reader = new(path);
-            reader.ReadLine(); // Skip the headers
-
-            // re-run the reader to set the size thresholds
-            while (!reader.EndOfStream)
+            // Set the size thresholds for each facility
+            foreach (Year year in years)
             {
-                line = reader.ReadLine();
-                string[] values = line.Split(',');
-
-                var year = values[csv_index_year];
-                var city_id = int.Parse(values[csv_index_city].Split('_').Last());
-                var building_class = values[csv_index_class];
-                var facility_type = values[csv_index_facility];
-
-                int index_passed_year = passed_years.IndexOf(year);
-                var current_year_obj = years[index_passed_year];
-
-                var passed_cities = current_year_obj.GetCityIds();
-                var index_passed_city = passed_cities.IndexOf(city_id);
-                var current_city_obj = current_year_obj.GetCities()[index_passed_city];
-
-                var passed_classes = current_city_obj.GetBuildingClassesNames();
-                var index_passed_class = passed_classes.IndexOf(building_class);
-                var current_class_obj = current_city_obj.GetBuildingClasses()[index_passed_class];
-
-                var passed_facilities = current_class_obj.GetFacilitiesNames();
-                var index_passed_facility = passed_facilities.IndexOf(facility_type);
-                var current_facility_obj = current_class_obj.GetFacilities()[index_passed_facility];
-
-                current_facility_obj.SetSizeThresholds();
+                foreach (CityObj city in year.GetCities())
+                {
+                    foreach (Building_Class building_class in city.GetBuildingClasses())
+                    {
+                        foreach (Facility facility in building_class.GetFacilities())
+                        {
+                            facility.SetSizeThresholds();
+                        }
+                    }
+                }
             }
-
-            reader.Close();
 
             reader = new(path);
             reader.ReadLine(); // Skip the headers
