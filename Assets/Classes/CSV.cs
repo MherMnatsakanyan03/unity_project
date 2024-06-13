@@ -62,6 +62,8 @@ namespace CityData
                         + city.GetArea().ToString()
                         + ", Buildings: "
                         + city.GetBuildingCount().ToString()
+                        + ", Max EUI: "
+                        + city.GetMaxEUI().ToString()
                         + "\n";
                     var building_classes = city.GetBuildingClasses();
                     foreach (var building_class in building_classes)
@@ -172,9 +174,9 @@ namespace CityData
                 var facility_type = values[csv_index_facility];
                 var house_id = int.Parse(values[csv_index_house_id]);
 
-                var avg_temp = ParseTemp(values[csv_index_avg_temp]);
+                var avg_temp = ParseDouble(values[csv_index_avg_temp]);
                 var area = ParseArea(values[csv_index_area]);
-                var site_eui = double.Parse(values[csv_index_site_eui]);
+                var site_eui = ParseDouble(values[csv_index_site_eui]);
 
                 bool rating_not_empty = int.TryParse(
                     values[csv_index_energy_star_rating],
@@ -197,7 +199,7 @@ namespace CityData
                 List<double> monthly_temps = new();
                 foreach (int index in csv_index_monthly_temp)
                 {
-                    monthly_temps.Add(ParseTemp(values[index]));
+                    monthly_temps.Add(ParseDouble(values[index]));
                 }
 
                 int index_passed_year = passed_years.IndexOf(year);
@@ -412,11 +414,11 @@ namespace CityData
         }
 
         /**
-         * Parse the temperature and area values from the CSV file
+         * Parse the doubles from the CSV file
          */
-        private double ParseTemp(string temp)
+        private double ParseDouble(string @double)
         {
-            string[] temp_split = temp.Split('.');
+            string[] temp_split = @double.Split('.');
             string parts = temp_split[0] + (temp_split.Length > 1 ?  "," + temp_split[1] : "");
             return Math.Round(double.Parse(parts), 2);
         }

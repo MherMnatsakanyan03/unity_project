@@ -74,5 +74,10 @@ namespace CityData
                 max_eui = eui;
             }
         }
+
+        public double GetMaxEUI()
+        {
+            return max_eui;
+        }
     }
 }
