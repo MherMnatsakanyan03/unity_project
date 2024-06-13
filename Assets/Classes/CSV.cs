@@ -355,14 +355,20 @@ namespace CityData
 
                             foreach (House house in facility.GetHouses())
                             {
-                                for (int type = 0; type < 3; type++)
+                                double small = facility.GetThreshoulds(0);
+                                double medium = facility.GetThreshoulds(1);
+                                //double large = facility.GetThreshoulds(2);
+                                if (house.GetArea() < small)
                                 {
-                                    double size = facility.GetThreshoulds(type);
-                                    if (house.GetArea() < size)
-                                    {
-                                        house.SetType(type);
-                                        break;
-                                    }
+                                    house.SetType(0);
+                                }
+                                else if (house.GetArea() < medium)
+                                {
+                                    house.SetType(1);
+                                }
+                                else
+                                {
+                                    house.SetType(2);
                                 }
                             }
                         }

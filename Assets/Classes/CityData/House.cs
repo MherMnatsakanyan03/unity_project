@@ -65,6 +65,11 @@ namespace CityData
             return temps_over_time;
         }
 
+        
+        public int GetSizeType()
+        {
+            return type;
+        }
         public void SetType(int type)
         {
             this.type = type;
