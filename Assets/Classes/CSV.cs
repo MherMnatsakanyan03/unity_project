@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,7 +18,13 @@ namespace CityData
             csv_index_class,
             csv_index_facility,
             csv_index_avg_temp,
-            csv_index_area;
+            csv_index_area,
+            csv_index_house_id,
+            csv_index_site_eui,
+            csv_index_year_built,
+            csv_index_energy_star_rating;
+
+        private List<int> csv_index_monthly_temp = new();
 
         private readonly List<Year> years = new();
 
@@ -86,9 +93,24 @@ namespace CityData
                                 + "\t Large: "
                                 + facility.GetCountPart(3).ToString()
                                 + "\t Size Thresholds: "
-                                + facility.GetUpperSizeToBeSmall().ToString()
+                                + facility.GetThreshoulds(0).ToString()
                                 + ", "
-                                + facility.GetUpperSizeToBeMedium().ToString()
+                                + facility.GetThreshoulds(1).ToString()
+                                + "\n";
+
+                            log +=
+                                "\t\t\t\tHouse ID: "
+                                + facility.GetHouses()[0].ID
+                                + ", Area: "
+                                + facility.GetHouses()[0].GetArea().ToString()
+                                + ", Site EUI: "
+                                + facility.GetHouses()[0].GetSiteEUI().ToString()
+                                + ", Year Built: "
+                                + facility.GetHouses()[0].GetYearBuilt().ToString()
+                                + ", Energy Star Rating: "
+                                + facility.GetHouses()[0].GetEnergyStarRating().ToString()
+                                + ", Monthly Temps: "
+                                + string.Join(", ", facility.GetHouses()[0].GetTempsOverTime())
                                 + "\n";
                         }
                     }
@@ -111,14 +133,32 @@ namespace CityData
 
             StreamReader reader = new(path);
             string line = reader.ReadLine();
-            headers = line.Split(',').OfType<string>().ToList();
+            headers = line.Split(',').ToList();
 
             csv_index_year = headers.IndexOf("Year_Factor");
             csv_index_city = headers.IndexOf("State_Factor");
             csv_index_class = headers.IndexOf("building_class");
             csv_index_facility = headers.IndexOf("facility_type");
+            csv_index_house_id = headers.IndexOf("id");
+
             csv_index_avg_temp = headers.IndexOf("avg_temp");
             csv_index_area = headers.IndexOf("floor_area");
+            csv_index_site_eui = headers.IndexOf("site_eui");
+            csv_index_year_built = headers.IndexOf("year_built");
+            csv_index_energy_star_rating = headers.IndexOf("energy_star_rating");
+
+            csv_index_monthly_temp.Add(headers.IndexOf("january_avg_temp"));
+            csv_index_monthly_temp.Add(headers.IndexOf("february_avg_temp"));
+            csv_index_monthly_temp.Add(headers.IndexOf("march_avg_temp"));
+            csv_index_monthly_temp.Add(headers.IndexOf("april_avg_temp"));
+            csv_index_monthly_temp.Add(headers.IndexOf("may_avg_temp"));
+            csv_index_monthly_temp.Add(headers.IndexOf("june_avg_temp"));
+            csv_index_monthly_temp.Add(headers.IndexOf("july_avg_temp"));
+            csv_index_monthly_temp.Add(headers.IndexOf("august_avg_temp"));
+            csv_index_monthly_temp.Add(headers.IndexOf("september_avg_temp"));
+            csv_index_monthly_temp.Add(headers.IndexOf("october_avg_temp"));
+            csv_index_monthly_temp.Add(headers.IndexOf("november_avg_temp"));
+            csv_index_monthly_temp.Add(headers.IndexOf("december_avg_temp"));
 
             // Initialize the years, cities, building classes, and facilities
             while (!reader.EndOfStream)
@@ -130,8 +170,35 @@ namespace CityData
                 var city_id = int.Parse(values[csv_index_city].Split('_').Last()); // Get the last character of the string
                 var building_class = values[csv_index_class];
                 var facility_type = values[csv_index_facility];
+                var house_id = int.Parse(values[csv_index_house_id]);
+
                 var avg_temp = ParseTemp(values[csv_index_avg_temp]);
                 var area = ParseArea(values[csv_index_area]);
+                var site_eui = double.Parse(values[csv_index_site_eui]);
+
+                bool rating_not_empty = int.TryParse(
+                    values[csv_index_energy_star_rating],
+                    out int energy_star_rating
+                );
+                if (!rating_not_empty)
+                {
+                    energy_star_rating = -1;
+                }
+
+                bool year_not_empty = int.TryParse(
+                    values[csv_index_year_built],
+                    out int year_built
+                );
+                if (!year_not_empty)
+                {
+                    year_built = -1;
+                }
+
+                List<double> monthly_temps = new();
+                foreach (int index in csv_index_monthly_temp)
+                {
+                    monthly_temps.Add(ParseTemp(values[index]));
+                }
 
                 int index_passed_year = passed_years.IndexOf(year);
 
@@ -146,6 +213,7 @@ namespace CityData
                     {
                         var current_city_obj = current_year_obj.GetCities()[index_passed_city];
                         current_city_obj.AddArea(area);
+                        current_city_obj.SetMaxEUI(site_eui);
                         current_city_obj.IncrementBuildingCount();
                         var passed_classes = current_city_obj.GetBuildingClassesNames();
                         var index_passed_class = passed_classes.IndexOf(building_class);
@@ -164,6 +232,16 @@ namespace CityData
                                 var current_facility_obj = current_class_obj.GetFacilities()[
                                     index_passed_facility
                                 ];
+                                var house = new House(
+                                    house_id,
+                                    area,
+                                    site_eui,
+                                    year_built,
+                                    energy_star_rating,
+                                    monthly_temps
+                                );
+
+                                current_facility_obj.AddHouse(house);
                                 current_facility_obj.IncrementCount();
                                 current_facility_obj.AddTemp(avg_temp);
                                 current_facility_obj.AddArea(area);
@@ -172,6 +250,16 @@ namespace CityData
                             else
                             {
                                 var facility_obj = new Facility(facility_type, avg_temp, area);
+                                var house = new House(
+                                    house_id,
+                                    area,
+                                    site_eui,
+                                    year_built,
+                                    energy_star_rating,
+                                    monthly_temps
+                                );
+
+                                facility_obj.AddHouse(house);
                                 current_class_obj.AddFacilityName(facility_type);
                                 current_class_obj.AddFacility(facility_obj);
                             }
@@ -181,7 +269,16 @@ namespace CityData
                         {
                             var building_class_obj = new Building_Class(building_class);
                             var facility_obj = new Facility(facility_type, avg_temp, area);
+                            var house = new House(
+                                house_id,
+                                area,
+                                site_eui,
+                                year_built,
+                                energy_star_rating,
+                                monthly_temps
+                            );
 
+                            facility_obj.AddHouse(house);
                             building_class_obj.AddFacilityName(facility_type);
                             building_class_obj.AddFacility(facility_obj);
                             current_city_obj.AddBuildingClassName(building_class);
@@ -193,17 +290,27 @@ namespace CityData
                         var city_obj = new CityObj(city_id, area);
                         var building_class_obj = new Building_Class(building_class);
                         var facility_obj = new Facility(facility_type, avg_temp, area);
+                        var house = new House(
+                            house_id,
+                            area,
+                            site_eui,
+                            year_built,
+                            energy_star_rating,
+                            monthly_temps
+                        );
 
+                        facility_obj.AddHouse(house);
                         building_class_obj.AddFacilityName(facility_type);
                         building_class_obj.AddFacility(facility_obj);
                         city_obj.AddBuildingClassName(building_class);
                         city_obj.AddBuildingClass(building_class_obj);
+                        city_obj.SetMaxEUI(site_eui);
                         current_year_obj.AddCity(city_obj);
                         current_year_obj.AddCityId(city_id);
                     }
                 }
                 // Else, add the year to the array and add the building class and facility
-                // (if no year, then no calss and facility)
+                // (if no year, then no class and facility)
                 else
                 {
                     passed_years.Add(year.ToString());
@@ -211,11 +318,21 @@ namespace CityData
                     var city_obj = new CityObj(city_id, area);
                     var building_class_obj = new Building_Class(building_class);
                     var facility_obj = new Facility(facility_type, avg_temp, area);
+                    var house = new House(
+                        house_id,
+                        area,
+                        site_eui,
+                        year_built,
+                        energy_star_rating,
+                        monthly_temps
+                    );
 
+                    facility_obj.AddHouse(house);
                     building_class_obj.AddFacilityName(facility_type);
                     building_class_obj.AddFacility(facility_obj);
                     city_obj.AddBuildingClassName(building_class);
                     city_obj.AddBuildingClass(building_class_obj);
+                    city_obj.SetMaxEUI(site_eui);
                     year_obj.AddCity(city_obj);
                     year_obj.AddCityId(city_id);
                     years.Add(year_obj);
@@ -223,7 +340,7 @@ namespace CityData
             }
             reader.Close();
 
-            // Set the size thresholds for each facility
+            // Set the size thresholds for each facility and more
             foreach (Year year in years)
             {
                 foreach (CityObj city in year.GetCities())
@@ -233,6 +350,19 @@ namespace CityData
                         foreach (Facility facility in building_class.GetFacilities())
                         {
                             facility.SetSizeThresholds();
+
+                            foreach (House house in facility.GetHouses())
+                            {
+                                for (int type = 0; type < 3; type++)
+                                {
+                                    double size = facility.GetThreshoulds(type);
+                                    if (house.GetArea() < size)
+                                    {
+                                        house.SetType(type);
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -251,6 +381,7 @@ namespace CityData
                 var city_id = int.Parse(values[csv_index_city].Split('_').Last()); // Get the last character of the string
                 var building_class = values[csv_index_class];
                 var facility_type = values[csv_index_facility];
+                var house_id = int.Parse(values[csv_index_house_id]);
                 var area = ParseArea(values[csv_index_area]);
 
                 int index_passed_year = passed_years.IndexOf(year);
@@ -268,6 +399,9 @@ namespace CityData
                 var index_passed_facility = passed_facilities.IndexOf(facility_type);
                 var current_facility_obj = current_class_obj.GetFacilities()[index_passed_facility];
 
+                var passed_houses = current_facility_obj.GetHouses();
+                var current_house_obj = passed_houses.Find(house => house.ID == house_id);
+
                 current_facility_obj.IncrementPartCount(area);
             }
 
@@ -282,7 +416,9 @@ namespace CityData
          */
         private double ParseTemp(string temp)
         {
-            return double.Parse(temp.Split('.')[0]);
+            string[] temp_split = temp.Split('.');
+            string parts = temp_split[0] + (temp_split.Length > 1 ?  "," + temp_split[1] : "");
+            return Math.Round(double.Parse(parts), 2);
         }
 
         /**

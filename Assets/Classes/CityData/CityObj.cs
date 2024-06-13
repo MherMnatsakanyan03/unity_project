@@ -8,6 +8,8 @@ namespace CityData
         private ulong area = 0;
         private int count_buildings = 0;
 
+        private double max_eui = 0;
+
         private readonly List<string> building_classes_names = new();
         private readonly List<Building_Class> building_classes = new();
 
@@ -63,6 +65,14 @@ namespace CityData
         public int GetBuildingCount()
         {
             return count_buildings;
+        }
+
+        public void SetMaxEUI(double eui)
+        {
+            if (eui > max_eui)
+            {
+                max_eui = eui;
+            }
         }
     }
 }
