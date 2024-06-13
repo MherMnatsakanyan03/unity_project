@@ -1,150 +1,187 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Grid: MonoBehaviour
 {
-    private int width;
-    private int height;
-    private int[,] gridArray;
-    private float cellSize;
     private int shift_x;
     private int shift_y;
-    private int house_width;
-    private int house_height;
-    private List<GameObject> folderObjects;
-    private GameObject house;
+    private float cellSize;
+    private int[,] gridArray;
 
-    public Grid(int width, int height, float cellSize, int shift_x, int shift_y, List<GameObject> folderObjects)
+    private int width;
+    private int height;
+    private int area;
+
+    private List<int> houses_area = new List<int>();
+    private List<int> number_houses = new List<int>();
+    private List<int> number_houses_cum_sum = new List<int>();
+    private List<float> house_width = new List<float>();
+    private List<float> house_height = new List<float>();
+    private List<float> house_x;
+    private List<float> house_y;
+    private string house_type;
+    private List<string> house_types = new List<string>();
+
+
+    private Transform parent;
+    private GameObject house_copy;
+    private GameObject cube;
+    private int counter = 0;
+    public float[] shares;
+    public int spacing = 2;
+
+
+    public Grid(Transform parent, int width, int height, float cellSize, int shift_x, int shift_y, List<int> houses_area, List<int> number_houses, string house_type)
     {
-        this.width = width;
-        this.height = height;
-        this.cellSize = cellSize;
         this.shift_x = shift_x;
         this.shift_y = shift_y;
-        this.folderObjects = folderObjects;
+        this.cellSize = cellSize;
 
-        this.house = choose_house();
-        this.house_width = (int)(Mathf.Round(house.GetComponent<Renderer>().bounds.size.x));
-        this.house_height = (int)(Mathf.Round(house.GetComponent<Renderer>().bounds.size.y));
+        this.width = width;
+        this.height = height;
+        this.area = width * height;
+
+        this.houses_area = houses_area;     //Wie groﬂ ist welches Haus (klein,mittel,groﬂ)
+        this.number_houses = number_houses; //Anzahl der H‰user in den jeweiligen Klassen (klein,mittel,groﬂ)
+        this.number_houses_cum_sum = cum_sum(number_houses);
+        this.house_type = house_type;
+        this.house_types.Add(house_type+"_small");
+        this.house_types.Add(house_type + "_middle");
+        this.house_types.Add(house_type + "_big");
+        this.parent = parent;
+        this.cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        this.cube.SetActive (false);
+
+        calculate_house_dimensions();
+        //calculate_house_positions(); Ist in Python
+        house_x = new List<float> { 6f, 7f, 3f, 3f, 5f, 5f, 0f, 0f, 3f, 0f };
+        house_y = new List<float> { 0f, 0f, 3f, 5f, 3f, 5f, 6f, 0f, 0f, 3f };
+        place_houses(house_x, house_y);
 
         this.gridArray = new int[width, height];
-        update(width, height, shift_x, shift_y,0,0);
-
+        fill_array(this.gridArray);
+        
     }
-    private bool space_available(int x, int y, int width, int height)
+
+    private List<int> cum_sum(List<int> list)
     {
-        for(int i = 0; i < width; i++)
+        List<int> cumulativeSum = new List<int>();
+
+        int sum = 0;
+        for (int i = 0; i < list.Count; i++)
         {
-            for(int j = 0; j < height; j++)
+            sum += list[i];
+            cumulativeSum.Add(sum);
+        }
+        return cumulativeSum;
+    }
+
+    public void calculate_house_dimensions()
+    {
+        foreach (var area in this.houses_area)
+        {
+            var a = (float)Math.Sqrt((double)area);
+            this.house_width.Add(a);
+            this.house_height.Add(a);
+            Debug.Log(a);
+        }
+        
+    }
+
+    public void drawOutlines()
+    {
+        for(int x = 0; x < width; x++)
+        {
+            for(int y = 0; y < height; y++)
             {
-                //Debug.Log("width: " + this.gridArray.GetLength(0) + " height: " this.gridArray.GetLength(1) +" "+ (y + j));
-                if (this.gridArray.GetLength(0) > x+i && this.gridArray.GetLength(1) > y+i)
+                if(x == 0 || y == 0)
                 {
-                    if (this.gridArray[x + i, y + j] == 1)
-                    {
-                        return false;
-                    }
-                }else
-                {
-                    return false;
+                    GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    cube.transform.parent = parent;
+                    cube.transform.position = parent.transform.position + new Vector3(x * cellSize + shift_x, 0, y * cellSize + shift_y);
                 }
                 
             }
         }
-        return true;
     }
-
-    private GameObject choose_house()
+    /*
+    public void update_grid(int width, int height, int shift_x, int shift_y)
     {
-        int randomIndex = Random.Range(0, folderObjects.Count);
-        return folderObjects[randomIndex];
-    }
-
-    public void update(int width, int height, int shift_x, int shift_y, float a, float b)
-    {
-        
+        this.width = width;
+        this.height = height;
         this.shift_x = shift_x;
         this.shift_y = shift_y;
         this.gridArray = new int[width, height];
-
-        this.house_width = (int)(Mathf.Round(this.house.GetComponent<Renderer>().bounds.size.x));
-        this.house_height = (int)(Mathf.Round(this.house.GetComponent<Renderer>().bounds.size.y));
-
-        var x = 0;
-        var y = 0;
-
-        //North
-        y = 0;
-        for (int i = 0; i < gridArray.GetLength(0); i++)
-        {
-            x = i;
-            if (space_available(x, y, house_width, house_height))
-            {
-                place_random(x, y);
-            }
-        }
-
-        //East
-        
-        x = gridArray.GetLength(0)- house_width;
-        for (int i = 0; i < gridArray.GetLength(1); i++)
-        {
-            y = i;
-            if (space_available(x, y, house_width, house_height))
-            {
-                place_random(x, y);
-            }
-        }
-        
-        //South
-        y = gridArray.GetLength(1)- house_height;
-        for (int i = 0; i < gridArray.GetLength(0); i++)
-        {
-            x = i;
-            if (space_available(x, y, house_width, house_height))
-            {
-                place_random(x, y);
-            }
-        }
-        
-        //West
-        /*
-        x = 0;
-        for (int i = 0; i < gridArray.GetLength(1); i++)
-        {
-            y = i;
-            if (space_available(x, y, house_width, house_height))
-            {
-                place_random(x, y);
-            }
-        }*/
-
+        fill_array(this.gridArray);
+        place_houses();
     }
+    */
 
-    private void place_random(int x, int y)
+    public void place_houses(List<float> house_x, List<float> house_y)
     {
-        
-        Instantiate(this.house, GetWorldPosition((int)(x+ this.house_width/2), (int)(y + this.house_height / 2)), Quaternion.identity);
-        var space = 2;
-        var x_border = (int)(Mathf.Max(0, x - space));
-        var y_border = (int)(Mathf.Max(0, y - space));
 
-        Debug.Log("place: " + " x: " + x + " y: " + y + " max: " + (int)(Mathf.Min(gridArray.GetLength(0) - this.house_width, x + this.house_width + space)));
-        for (int i= x_border; i< (int)(Mathf.Min(gridArray.GetLength(0) - this.house_width+1, x + this.house_width + space)); i++)
+        for(int i = 0; i < house_x.Count; i++)
         {
-            for (int j = y_border; j < (int)(Mathf.Min(gridArray.GetLength(1) - this.house_height+1, y + this.house_height + space)); j++)
-            {
-                Debug.Log("x: " + x + " y: " + y + " j: " + j + "  "+ Mathf.Min(gridArray.GetLength(1) - this.house_height+1) + "  " + (y + this.house_height + space));
-                this.gridArray[i, j] = 1;
-            }
+            this.house_copy = choose_house(i);
+            House house = new House(GetWorldPosition((int)house_x[i], (int)house_y[i]), this.house_copy, 200f, 1995, UnityEngine.Random.Range(0, 101), 10, 10);
+            GameObject t = house.create_house();    
+            t.SetActive(true);
+            t.transform.SetParent(parent);
+            t.tag = house_type;
         }
     }
 
+    private GameObject choose_house(int i)
+    {
+        if (i >= this.number_houses_cum_sum[this.counter])
+        {
+            this.counter++;
+        }
+        var x = (int)Math.Sqrt((double)this.houses_area[counter]);
+        this.cube.transform.localScale = new Vector3(x,x,x);
+        house_type = house_types[counter];
+        return this.cube;
+        
+    }
 
+    private void destroy_gameobjects()
+    {
+        GameObject[] testObjects = GameObject.FindGameObjectsWithTag(this.house_type);
+
+        foreach (GameObject obj in testObjects)
+        {
+            Destroy(obj);
+        }
+    }
 
     private Vector3 GetWorldPosition(int x, int y)
     {
-        return new Vector3(x- shift_x,0, y-shift_y) * cellSize;
+        var width = this.house_copy.GetComponent<Renderer>().bounds.size.x;
+        var height = this.house_copy.GetComponent<Renderer>().bounds.size.y;
+        var size = this.house_copy.GetComponent<Renderer>().bounds.size.z;
+        return new Vector3(x+this.shift_x+ width/2, size/2, y+this.shift_y+ height/2) * cellSize;
+    }
+
+    private void fill_array(int[,] array)
+    {
+        for(int i=0;i< this.width; i++)
+        {
+            for(int j = 0; j < this.height; j++)
+            {
+                if(j < 2)
+                {
+                    this.gridArray[i, j] = 1;
+                }
+                else
+                {
+                    this.gridArray[i, j] = 0;
+                }
+                
+            }
+        }
     }
 }

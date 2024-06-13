@@ -1,137 +1,163 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using UnityEngine;
-using System.IO;
 
 public class City : MonoBehaviour
 {
-    private bool s = true;
-    private List<Matrix4x4> streetMatricesN;
-    private List<Matrix4x4> edgeMatricesN;
 
     [SerializeField]
-    private float districtSquareMeterSize;
-    private float previousdistrictSquareMeterSize = 0;
+    private GameObject district;
 
-    [SerializeField]
-    private Mesh streetMesh, edgeMesh;
+    private List<GameObject> copiedObject = new List<GameObject>();
 
-    [SerializeField]
-    private Material streetMateria0, streetMateria1, edgeMateria0, edgeMateria1;
-
-    [SerializeField]
-    private GameObject cube;
-
-    private Vector3 streetSize;
-    private Vector3 edgeSize;
-    private float randomNumber;
-    private GameObject[] folderObjects;
-
-    private Grid grid;
-
-    void renderStreets()
-    {
-        if (streetMatricesN != null)
-        {
-            Graphics.DrawMeshInstanced(streetMesh, 0, streetMateria0, streetMatricesN.ToArray(), streetMatricesN.Count);
-            Graphics.DrawMeshInstanced(streetMesh, 1, streetMateria1, streetMatricesN.ToArray(), streetMatricesN.Count);
-        }
-
-        if (edgeMatricesN != null)
-        {
-            Graphics.DrawMeshInstanced(edgeMesh, 0, edgeMateria0, edgeMatricesN.ToArray(), edgeMatricesN.Count);
-            Graphics.DrawMeshInstanced(edgeMesh, 1, edgeMateria1, edgeMatricesN.ToArray(), edgeMatricesN.Count);
-        }
-    }
-
-    void createStreet()
-    {
-        streetMatricesN = new List<Matrix4x4>();
-        edgeMatricesN = new List<Matrix4x4>();
-
-        var b = Mathf.Sqrt(districtSquareMeterSize / randomNumber) * 10;
-        var a = randomNumber * b;
-
-        int streetCount = Mathf.Max(1, (int)(b / streetSize.y));
-        float scale = (b / streetCount) / streetSize.y;
-
-        grid.update((int)b, (int)a, (int)(b / 2), 0, (float)(a), (float)(b));
-
-        var t = transform.position + new Vector3(-b / 2- edgeSize.y/2 + 2.8f, 0, -streetSize.x / 2);
-        var r = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(-90, -90, 0));
-        var s = new Vector3(1, 1, 1);
-        var mat = Matrix4x4.TRS(t, r, s);
-        edgeMatricesN.Add(mat);
-        t = transform.position + new Vector3(b / 2 + edgeSize.y / 2 - 2.8f, 0, -streetSize.x / 2);
-        r = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(-90, 180, 0));
-        mat = Matrix4x4.TRS(t, r, s);
-        edgeMatricesN.Add(mat);
-        t = transform.position + new Vector3(-b / 2 - edgeSize.y / 2 + 2.8f, 0, a + streetSize.x / 2);
-        r = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(-90, 0, 0));
-        mat = Matrix4x4.TRS(t, r, s);
-        edgeMatricesN.Add(mat);
-        t = transform.position + new Vector3(b / 2 + edgeSize.y / 2 - 2.8f, 0, a + streetSize.x / 2);
-        r = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(-90, 90, 0));
-        mat = Matrix4x4.TRS(t, r, s);
-        edgeMatricesN.Add(mat);
-
-        for (int i = 0; i < streetCount; i++)
-        {
-            t = transform.position + new Vector3(-b/2 + streetSize.y * scale /2 + i * scale * streetSize.y, 0, -streetSize.x/2);
-            r = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(-90, 90, 0));
-            s = new Vector3(1, scale, 1);
-
-            mat = Matrix4x4.TRS(t, r, s);
-            streetMatricesN.Add(mat);
-
-            t = transform.position + new Vector3(-b / 2 + streetSize.y * scale / 2 + i * scale * streetSize.y, 0, a + streetSize.x / 2);
-            mat = Matrix4x4.TRS(t, r, s);
-            streetMatricesN.Add(mat);
-        }
-
-        streetCount = Mathf.Max(1, (int)(a / streetSize.y));
-        scale = (a / streetCount) / streetSize.y;
-
-        for (int i = 0; i < streetCount; i++)
-        {
-            t = transform.position + new Vector3(-b/2-streetSize.x/2, 0,streetSize.y * scale / 2 + i * scale * streetSize.y);
-            r = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(-90, 0, 0));
-            s = new Vector3(1, scale, 1);
-
-            mat = Matrix4x4.TRS(t, r, s);
-            streetMatricesN.Add(mat);
-
-            t = transform.position + new Vector3(b/2+ streetSize.x / 2, 0,streetSize.y * scale / 2 + i * scale * streetSize.y);
-            mat = Matrix4x4.TRS(t, r, s);
-            streetMatricesN.Add(mat);
-        }
-
-    }
-
-
-    // Start is called before the first frame update
     void Start()
     {
+        //"Food", "Warehouse", "Retail", "Education", "Office", "Commercial", "Public", "Peoples", "Health_Care"
+        //, "Retail", "Education", "Office", "Commercial" , "Public", "Peoples", "Health_Care"
+        List<string> district_names = new List<string> { "Food", "Warehouse", "Retail", "Education", "Office", "Commercial", "Public", "Peoples", "Health_Care" };
         System.Random random = new System.Random();
-        randomNumber = (float)random.NextDouble() * 0.2f + 0.4f;
-        streetSize = streetMesh.bounds.size;
-        edgeSize = edgeMesh.bounds.size;
 
-        List<GameObject> game_objects = new List<GameObject>(GameObject.FindGameObjectsWithTag("test"));
-        Debug.Log(game_objects.Count);
-        //GameObject randomSpawnPoint = spawnPoints[Random.Range(0, spawnPoints.Count)];
+        float position_x = 0;
 
-        grid = new Grid(0, 0, 1f, 0, 0, game_objects);
+        foreach (string district_name in district_names)
+        {
+            GameObject new_district = Instantiate(district);
+            District script = new_district.GetComponent<District>();
+            script.district_type = district_name;
+            new_district.transform.SetParent(transform);
+            copiedObject.Add(new_district);
+        }
+        arange_city();
     }
+    
+    private void arange_city()
+    {
+        float new_postion_x = 0;
+        float new_postion_y = 0;
+        float shift_x = 0;
+        float shift_y = 0;
+        float rotate_x = 0;
+        float rotate_y = 0;
+        float rotation = 0;
+        District parten_district_script = null;
+        List<District> parent_district_scripts = new List<District>();
+        int i = 0;
+        foreach(GameObject district in copiedObject)
+        {
+            
+            District script = district.GetComponent<District>();
+            
+            script.districtSquareMeterSize = 50 + i * 10;
+            script.create_district();
+            district.GetComponent<BoxCollider>().size = new Vector3(script.height, 1, script.width);
+            district.GetComponent<BoxCollider>().center = new Vector3(0, 1, script.width / 2 - script.street_width/2);
+
+            var width = 0 - script.street_width / 2;
+            var height = -script.height / 2;
+
+            if (i == 0) { parten_district_script = script; }
+
+                switch (i)
+                {
+                    case 0:
+                        break;
+                    case 1:
+                        rotation = 0;
+                        new_postion_x = -parten_district_script.width + script.street_width / 2;
+                        new_postion_y = parten_district_script.height / 2;
+                        shift_x = new_postion_x - height;
+                        shift_y = new_postion_y  - width;
+
+                        district.transform.RotateAround(new Vector3(rotate_x, 0, rotate_y), Vector3.up, rotation);
+                        district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
+                        parent_district_scripts.Add(script);
+                        break;
+                    case 2:
+                        rotation = 90;
+                        new_postion_x = parten_district_script.width - script.street_width / 2;
+                        new_postion_y = parten_district_script.height / 2;
+                        shift_x = new_postion_x - height;
+                        shift_y = new_postion_y - width;
+
+                        district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
+                        district.transform.RotateAround(new Vector3(new_postion_x, 0, new_postion_y), Vector3.up, rotation);
+                        parent_district_scripts.Add(script);
+                        break;
+                    case 3:
+                        rotation = 180;
+                        new_postion_x = parten_district_script.width - script.street_width / 2;
+                        new_postion_y = 0 - script.street_width / 2;
+                        shift_x = new_postion_x - height;
+                        shift_y = new_postion_y - width;
+
+                        district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
+                        district.transform.RotateAround(new Vector3(new_postion_x, 0, new_postion_y), Vector3.up, rotation);
+                        parent_district_scripts.Add(script);
+                        break;
+                    case 4:
+                        rotation = 270;
+                        new_postion_x = -parten_district_script.width + script.street_width / 2;
+                        new_postion_y = 0 - script.street_width / 2;
+                        shift_x = new_postion_x - height;
+                        shift_y = new_postion_y - width;
+
+                        district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
+                        district.transform.RotateAround(new Vector3(new_postion_x, 0, new_postion_y), Vector3.up, rotation);
+                        parent_district_scripts.Add(script);
+                        break;
+                    case 5:
+                        rotation = 0;
+                        new_postion_x = -parten_district_script.width + script.street_width / 2;
+                        new_postion_y = parten_district_script.height / 2 + parent_district_scripts[0].width;
+                        shift_x = new_postion_x - height;
+                        shift_y = new_postion_y - width;
+
+                        district.transform.RotateAround(new Vector3(rotate_x, 0, rotate_y), Vector3.up, rotation);
+                        district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
+                        break;
+                    case 6:
+                        rotation = 90;
+                        new_postion_x = parten_district_script.width - script.street_width / 2 + parent_district_scripts[1].width;
+                        new_postion_y = parten_district_script.height / 2;
+                        shift_x = new_postion_x - height;
+                        shift_y = new_postion_y - width;
+
+                        district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
+                        district.transform.RotateAround(new Vector3(new_postion_x, 0, new_postion_y), Vector3.up, rotation);
+                        break;
+                    case 7:
+                        rotation = 180;
+                        new_postion_x = parten_district_script.width - script.street_width / 2;
+                        new_postion_y = 0 - script.street_width / 2 - parent_district_scripts[2].width;
+                        shift_x = new_postion_x - height;
+                        shift_y = new_postion_y - width;
+
+                        district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
+                        district.transform.RotateAround(new Vector3(new_postion_x, 0, new_postion_y), Vector3.up, rotation);
+                        break;
+                    case 8:
+                        rotation = 270;
+                        new_postion_x = -parten_district_script.width + script.street_width / 2 - parent_district_scripts[3].width;
+                        new_postion_y = 0 - script.street_width / 2;
+                        shift_x = new_postion_x - height;
+                        shift_y = new_postion_y - width;
+
+                        district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
+                        district.transform.RotateAround(new Vector3(new_postion_x, 0, new_postion_y), Vector3.up, rotation);
+                        parent_district_scripts.Add(script);
+                        break;
+                    default:
+                        break;
+                }
+
+            i++;
+        }
+    }
+
 
     void Update()
     {
-        if (previousdistrictSquareMeterSize != districtSquareMeterSize)
-        {
-            createStreet();
-            previousdistrictSquareMeterSize = districtSquareMeterSize;
-        }
-        renderStreets();
+        //arange_city();
     }
-
 }
