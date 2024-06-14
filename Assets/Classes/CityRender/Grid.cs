@@ -57,6 +57,13 @@ public class Grid: MonoBehaviour
         this.cube.SetActive (false);
 
         calculate_house_dimensions();
+
+        this.height;
+        this.width;
+        this.house_height;
+        this.house_width;
+        this.number_houses;
+
         //calculate_house_positions(); Ist in Python
         house_x = new List<float> { 6f, 7f, 3f, 3f, 5f, 5f, 0f, 0f};
         house_y = new List<float> { 0f, 0f, 3f, 5f, 3f, 5f, 6f, 0f};
