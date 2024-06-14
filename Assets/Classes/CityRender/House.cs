@@ -41,7 +41,7 @@ public class House : MonoBehaviour
         this.energy_star = energy_star;
         this.colling_degree_days = colling_degree_days;
         this.warming_degree_days = warming_degree_days;
-
+        Debug.Log(EventListener.current);
         EventListener.current.show_energy_star += show_energy_star;
     }
 

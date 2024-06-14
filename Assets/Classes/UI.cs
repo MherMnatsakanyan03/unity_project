@@ -1,3 +1,4 @@
+using CityData;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -25,6 +26,8 @@ public class UI : MonoBehaviour
     private int currentYearIndex = 0;
     private int currentCityIndex = 0;
     private const int YEAR_OFFSET = 2005;
+    [SerializeField]
+    private GameObject city;
 
     // Placeholder Cubes, shoukd be replaced with actual city data
     private GameObject[] cubes;
@@ -46,10 +49,37 @@ public class UI : MonoBehaviour
         FocusCameraOnCity(currentCityIndex);
     }
 
+    void Start()
+    {
+        CreateCitys();
+    }
+
     /* ================================================ Private Functions =============================================== */
     /**
      * Move to the next year
      */
+
+    private void CreateCitys()
+    {
+        int i = 0;
+        foreach (CityObj city_obj in years[0].GetCities())
+        {
+            GameObject new_city = Instantiate(city);
+            City script = new_city.GetComponent<City>();
+            script.city_data = city_obj;
+            script.create_city();
+            new_city.transform.position = new Vector3(1000*i, 0, 0);
+            i++;
+        }
+
+        /*
+        foreach (Year year in years)
+        {
+            
+            
+        }*/
+    }
+
     private void NextYear()
     {
         if (currentYearIndex < years.Count - 1)

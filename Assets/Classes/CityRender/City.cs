@@ -2,29 +2,30 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using UnityEngine;
+using CityData;
 
 public class City : MonoBehaviour
 {
+    public CityData.CityObj city_data;
+    private Building_Class building_class;
 
     [SerializeField]
     private GameObject district;
 
     private List<GameObject> copiedObject = new List<GameObject>();
 
-    void Start()
+    public void create_city()
     {
-        //"Food", "Warehouse", "Retail", "Education", "Office", "Commercial", "Public", "Peoples", "Health_Care"
-        //, "Retail", "Education", "Office", "Commercial" , "Public", "Peoples", "Health_Care"
-        List<string> district_names = new List<string> { "Food", "Warehouse", "Retail", "Education", "Office", "Commercial", "Public", "Peoples", "Health_Care" };
+        building_class = city_data.GetBuildingClasses()[0];
+        List<string> district_names = building_class.GetFacilitiesNames();
         System.Random random = new System.Random();
 
-        float position_x = 0;
-
-        foreach (string district_name in district_names)
+        for(int i=0;i< district_names.Count;i++)
         {
             GameObject new_district = Instantiate(district);
             District script = new_district.GetComponent<District>();
-            script.district_type = district_name;
+            script.facility_data = building_class.GetFacilities()[i];
+            script.district_type = district_names[i];
             new_district.transform.SetParent(transform);
             copiedObject.Add(new_district);
         }

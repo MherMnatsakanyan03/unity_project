@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.IO;
 using UnityEngine;
+using CityData;
 
 public class District : MonoBehaviour
 {
@@ -17,9 +18,11 @@ public class District : MonoBehaviour
     public float street_width;
     public float districtSquareMeterSize = 40f;
 
+    public Facility facility_data;
+
     public void create_district()
     {
-        
+        districtSquareMeterSize = facility_data.GetTotalArea()/100000;
         float randomNumber = 0.5f;
         var b = (int)Mathf.Sqrt(districtSquareMeterSize / randomNumber) * 10;
         var a = (int)(randomNumber * b);
@@ -46,9 +49,9 @@ public class District : MonoBehaviour
         }
 
         //Create Houses
-        get_house_modells(district_type);
-        List<int> houses_area = new List<int> { 1, 4, 9 };
-        List<int> number_houses = new List<int> { 2, 5, 3 };
+        //get_house_modells(district_type);
+        List<int> houses_area = new List<int> { (int)facility_data.GetThreshoulds(0)/100000, (int)facility_data.GetThreshoulds(1)/100000, (int)facility_data.GetThreshoulds(2)/100000 };
+        List<int> number_houses = new List<int> { (int)facility_data.GetCountPart(0), (int)facility_data.GetCountPart(1), (int)facility_data.GetCountPart(2) };
         Grid grid = new Grid(gameObject.transform, (int)(b), (int)(a), 1, -(int)(a), 0, houses_area, number_houses, district_type);
         //grid.drawOutlines();
     }
@@ -84,7 +87,7 @@ public class District : MonoBehaviour
             {
                 if (hit.collider.gameObject == this.gameObject)  // Überprüfen, ob das getroffene GameObject das gewünschte ist
                 {
-                    Debug.Log(this.gameObject.transform.position - new Vector3(0,0,this.width / 2 - this.street_width / 2));
+                    Debug.Log(facility_data.GetCount());
                 }
             }
         }

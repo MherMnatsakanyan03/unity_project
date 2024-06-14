@@ -58,8 +58,8 @@ public class Grid: MonoBehaviour
 
         calculate_house_dimensions();
         //calculate_house_positions(); Ist in Python
-        house_x = new List<float> { 6f, 7f, 3f, 3f, 5f, 5f, 0f, 0f, 3f, 0f };
-        house_y = new List<float> { 0f, 0f, 3f, 5f, 3f, 5f, 6f, 0f, 0f, 3f };
+        house_x = new List<float> { 6f, 7f, 3f, 3f, 5f, 5f, 0f, 0f};
+        house_y = new List<float> { 0f, 0f, 3f, 5f, 3f, 5f, 6f, 0f};
         place_houses(house_x, house_y);
 
         this.gridArray = new int[width, height];
@@ -87,7 +87,6 @@ public class Grid: MonoBehaviour
             var a = (float)Math.Sqrt((double)area);
             this.house_width.Add(a);
             this.house_height.Add(a);
-            Debug.Log(a);
         }
         
     }
@@ -135,12 +134,16 @@ public class Grid: MonoBehaviour
         }
     }
 
-    private GameObject choose_house(int i)
+    private GameObject choose_house (int i)
     {
-        if (i >= this.number_houses_cum_sum[this.counter])
-        {
-            this.counter++;
+        for (int j = 0; j < 2; j++){
+            Debug.Log("i: " + i + " " + this.counter + " cum: " + this.number_houses_cum_sum[this.counter]);
+            if (i >= this.number_houses_cum_sum[this.counter] && this.counter < 2)
+            {
+                this.counter++;
+            }
         }
+
         var x = (int)Math.Sqrt((double)this.houses_area[counter]);
         this.cube.transform.localScale = new Vector3(x,x,x);
         house_type = house_types[counter];
