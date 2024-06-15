@@ -2,92 +2,125 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.IO;
-using UnityEngine;
 using CityData;
+using UnityEngine;
 
-public class District : MonoBehaviour
+namespace CityRender
 {
-    [SerializeField]
-    private GameObject street_original, street_edge_original;
-
-    private List<GameObject> houses = new List<GameObject>();
-    public string district_type = "Warehouse";
-
-    public float width;
-    public float height;
-    public float street_width;
-    public float districtSquareMeterSize = 40f;
-
-    public Facility facility_data;
-
-    public void create_district()
+    public class District : MonoBehaviour
     {
-        districtSquareMeterSize = facility_data.GetTotalArea()/100000;
-        float randomNumber = 0.5f;
-        var b = (int)Mathf.Sqrt(districtSquareMeterSize / randomNumber) * 10;
-        var a = (int)(randomNumber * b);
+        [SerializeField]
+        private GameObject street_original,
+            street_edge_original;
 
-        this.street_width = street_original.GetComponent<Renderer>().bounds.size.x;
-        this.width = a + street_width;
-        this.height = b + street_width;
+        private List<GameObject> houses = new List<GameObject>();
+        public string district_type = "Warehouse";
 
-        //Create Streets
-        (List<Matrix4x4> streetMatricesN, List<Matrix4x4> edgeMatricesN) = StreetPositionCalculator.createStreet_Matrix4x4(gameObject, street_original, street_edge_original,a,b);
-        for (int i = 0; i < streetMatricesN.Count; i++)
+        public float width;
+        public float height;
+        public float street_width;
+        public float districtSquareMeterSize = 40f;
+
+        public Facility facility_data;
+
+        public void create_district()
         {
-            Matrix4x4 matrix = streetMatricesN[i];
-            GameObject street = Instantiate(street_original);
-            street.transform.SetParent(gameObject.transform);
-            StreetPositionCalculator.SetTransformFromMatrix(street.transform,ref matrix);
-        }
-        for(int i = 0;i < edgeMatricesN.Count; i++)
-        {
-            Matrix4x4 matrix = edgeMatricesN[i];
-            GameObject street = Instantiate(street_edge_original);
-            street.transform.SetParent(gameObject.transform);
-            StreetPositionCalculator.SetTransformFromMatrix(street.transform, ref matrix);
-        }
+            districtSquareMeterSize = facility_data.GetTotalArea() / 100000;
+            float randomNumber = 0.5f;
+            var b = (int)Mathf.Sqrt(districtSquareMeterSize / randomNumber) * 10;
+            var a = (int)(randomNumber * b);
 
-        //Create Houses
-        //get_house_modells(district_type);
-        List<int> houses_area = new List<int> { (int)facility_data.GetThreshoulds(0)/100000, (int)facility_data.GetThreshoulds(1)/100000, (int)facility_data.GetThreshoulds(2)/100000 };
-        List<int> number_houses = new List<int> { (int)facility_data.GetCountPart(0), (int)facility_data.GetCountPart(1), (int)facility_data.GetCountPart(2) };
-        Grid grid = new Grid(gameObject.transform, (int)(b), (int)(a), 1, -(int)(a), 0, houses_area, number_houses, district_type);
-        //grid.drawOutlines();
-    }
+            this.street_width = street_original.GetComponent<Renderer>().bounds.size.x;
+            this.width = a + street_width;
+            this.height = b + street_width;
 
-    private void get_house_modells(string house_type_name)
-    {
-        string directoryPath = "Assets/Resources/House/" + house_type_name;
-        string[] directoryContents = Directory.GetFiles(directoryPath);
-        foreach (string file in directoryContents)
-        {
-            string substring = Path.GetFileName(file);
-            GameObject loadedObject = Resources.Load<GameObject>("House/" + house_type_name + "/" + substring.Substring(0, substring.Length - 7));
-            if (loadedObject != null)
+            //Create Streets
+            (List<Matrix4x4> streetMatricesN, List<Matrix4x4> edgeMatricesN) =
+                StreetPositionCalculator.createStreet_Matrix4x4(
+                    gameObject,
+                    street_original,
+                    street_edge_original,
+                    a,
+                    b
+                );
+            for (int i = 0; i < streetMatricesN.Count; i++)
             {
-                houses.Add(loadedObject);
+                Matrix4x4 matrix = streetMatricesN[i];
+                GameObject street = Instantiate(street_original);
+                street.transform.SetParent(gameObject.transform);
+                StreetPositionCalculator.SetTransformFromMatrix(street.transform, ref matrix);
+            }
+            for (int i = 0; i < edgeMatricesN.Count; i++)
+            {
+                Matrix4x4 matrix = edgeMatricesN[i];
+                GameObject street = Instantiate(street_edge_original);
+                street.transform.SetParent(gameObject.transform);
+                StreetPositionCalculator.SetTransformFromMatrix(street.transform, ref matrix);
+            }
+
+            //Create Houses
+            //get_house_modells(district_type);
+            List<int> houses_area = new List<int>
+            {
+                (int)facility_data.GetThreshoulds(0) / 100000,
+                (int)facility_data.GetThreshoulds(1) / 100000,
+                (int)facility_data.GetThreshoulds(2) / 100000
+            };
+            List<int> number_houses = new List<int>
+            {
+                (int)facility_data.GetCountPart(0),
+                (int)facility_data.GetCountPart(1),
+                (int)facility_data.GetCountPart(2)
+            };
+            Grid grid = new Grid(
+                gameObject.transform,
+                (int)(b),
+                (int)(a),
+                1,
+                -(int)(a),
+                0,
+                houses_area,
+                number_houses,
+                district_type
+            );
+            //grid.drawOutlines();
+        }
+
+        private void get_house_modells(string house_type_name)
+        {
+            string directoryPath = "Assets/Resources/House/" + house_type_name;
+            string[] directoryContents = Directory.GetFiles(directoryPath);
+            foreach (string file in directoryContents)
+            {
+                string substring = Path.GetFileName(file);
+                GameObject loadedObject = Resources.Load<GameObject>(
+                    "House/" + house_type_name + "/" + substring.Substring(0, substring.Length - 7)
+                );
+                if (loadedObject != null)
+                {
+                    houses.Add(loadedObject);
+                }
             }
         }
-    }
 
-    void Start()
-    {
-        //create_district();
-    }
-
-    private void Update()
-    {
-        if (Input.GetMouseButtonDown(0))  // Überprüfen, ob die linke Maustaste gedrückt wurde
+        void Start()
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);  // Erzeugen eines Strahls von der Mausposition
-            RaycastHit hit;
+            //create_district();
+        }
 
-            if (Physics.Raycast(ray, out hit))  // Überprüfen, ob der Strahl ein GameObject getroffen hat
+        private void Update()
+        {
+            if (Input.GetMouseButtonDown(0)) // ï¿½berprï¿½fen, ob die linke Maustaste gedrï¿½ckt wurde
             {
-                if (hit.collider.gameObject == this.gameObject)  // Überprüfen, ob das getroffene GameObject das gewünschte ist
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // Erzeugen eines Strahls von der Mausposition
+                RaycastHit hit;
+
+                if (Physics.Raycast(ray, out hit)) // ï¿½berprï¿½fen, ob der Strahl ein GameObject getroffen hat
                 {
-                    Debug.Log(facility_data.GetCount());
+                    if (hit.collider.gameObject == this.gameObject) // ï¿½berprï¿½fen, ob das getroffene GameObject das gewï¿½nschte ist
+                    {
+                        Debug.Log(facility_data.GetCount());
+                    }
                 }
             }
         }

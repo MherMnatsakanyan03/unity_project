@@ -5,29 +5,30 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
 
-
-public class EventListener : MonoBehaviour
+namespace CityRender
 {
-    public static EventListener current;
-    public event Action show_energy_star;
-
-    public void Awake()
+    public class EventListener : MonoBehaviour
     {
-        current = this;
-    }
+        public static EventListener current;
+        public event Action show_energy_star;
 
-    void Update()
-    {
-        if (Input.GetKeyDown("space"))
+        public void Awake()
         {
-            show_energy_star.Invoke();
+            current = this;
         }
-        if (Input.GetKeyDown("a"))
-        {
-            RenderSettings.fog = true;
-            RenderSettings.fogDensity = 0.1f;
-            //RenderSettings.fogColor = Color.gray;
 
+        void Update()
+        {
+            if (Input.GetKeyDown("space"))
+            {
+                show_energy_star.Invoke();
+            }
+            if (Input.GetKeyDown("a"))
+            {
+                RenderSettings.fog = true;
+                RenderSettings.fogDensity = 0.1f;
+                //RenderSettings.fogColor = Color.gray;
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using CSVReader = CityData.CSVReader;
 using Year = CityData.Year;
+using City = CityRender.City;
 
 public class UI : MonoBehaviour
 {
@@ -55,9 +56,6 @@ public class UI : MonoBehaviour
     }
 
     /* ================================================ Private Functions =============================================== */
-    /**
-     * Move to the next year
-     */
 
     private void CreateCitys()
     {
@@ -85,6 +83,9 @@ public class UI : MonoBehaviour
         }*/
     }
 
+    /**
+     * Move to the next year
+     */
     private void NextYear()
     {
         if (currentYearIndex < years.Count - 1)
