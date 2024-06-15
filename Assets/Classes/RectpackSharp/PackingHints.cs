@@ -90,6 +90,7 @@ namespace RectpackSharp
         /// <remarks>
         /// The <see cref="PackingRectangle.SortKey"/> values will be modified.
         /// </remarks>
+        public static void SortByPackingHint(Span<PackingRectangle> rectangles, PackingHints packingHint)
 #if NET5_0_OR_GREATER
         public static void SortByPackingHint(Span<PackingRectangle> rectangles, PackingHints packingHint)
 #elif NETSTANDARD2_0

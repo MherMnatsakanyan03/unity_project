@@ -26,6 +26,9 @@ namespace RectpackSharp
         /// <remarks>
         /// The <see cref="PackingRectangle.Id"/> values are never touched. Use this to identify your rectangles.
         /// </remarks>
+        public static void Pack(Span<PackingRectangle> rectangles, out PackingRectangle bounds,
+            PackingHints packingHint = PackingHints.FindBest, double acceptableDensity = 1, uint stepSize = 1,
+            uint? maxBoundsWidth = null, uint? maxBoundsHeight = null)
 #if NET5_0_OR_GREATER
         public static void Pack(Span<PackingRectangle> rectangles, out PackingRectangle bounds,
             PackingHints packingHint = PackingHints.FindBest, double acceptableDensity = 1, uint stepSize = 1,
@@ -84,6 +87,9 @@ namespace RectpackSharp
             bool hasSolution = false;
 
             // In one array we'll store the current best solution, and we'll also need two temporary arrays.
+            Span<PackingRectangle> currentBest = rectangles;
+            Span<PackingRectangle> tmpBest = new PackingRectangle[rectangles.Length];
+            Span<PackingRectangle> tmpArray = new PackingRectangle[rectangles.Length];
 #if NET5_0_OR_GREATER
             Span<PackingRectangle> currentBest = rectangles;
             Span<PackingRectangle> tmpBest = new PackingRectangle[rectangles.Length];
@@ -93,12 +99,13 @@ namespace RectpackSharp
             PackingRectangle[] tmpBest = new PackingRectangle[rectangles.Length];
             PackingRectangle[] tmpArray = new PackingRectangle[rectangles.Length];
 #endif
-       
+
 
             // For each of the specified hints, we try to pack and see if we can find a better solution.
             for (int i = 0; i < hints.Length && (!hasSolution || currentBestArea > acceptableBoundsArea); i++)
             {
                 // We copy the rectangles onto the tmpBest array, then sort them by what the packing hint says.
+                currentBest.CopyTo(tmpBest);
 #if NET5_0_OR_GREATER
                 currentBest.CopyTo(tmpBest);
 #elif NETSTANDARD2_0
@@ -121,6 +128,7 @@ namespace RectpackSharp
                     binHeight = bounds.Height;
 
                     // We swap tmpBest and currentBest
+                    Span<PackingRectangle> swaptmp = tmpBest;
 #if NET5_0_OR_GREATER
                     Span<PackingRectangle> swaptmp = tmpBest;
 #elif NETSTANDARD2_0
@@ -137,6 +145,7 @@ namespace RectpackSharp
 
             // The solution should be in the "rectangles" array passed as parameter.
             if (currentBest != rectangles)
+                currentBest.CopyTo(rectangles);
 #if NET5_0_OR_GREATER
                 currentBest.CopyTo(rectangles);
 #elif NETSTANDARD2_0
@@ -160,6 +169,8 @@ namespace RectpackSharp
         /// <param name="acceptableArea">Stops searching once a bin with this area or less is found.</param>
         /// <param name="bounds">The bounds of the resulting bin (0, 0, width, height).</param>
         /// <returns>Whether a solution was found.</returns>
+        private static bool TryFindBestBin(List<PackingRectangle> emptySpaces, ref Span<PackingRectangle> rectangles,
+            ref Span<PackingRectangle> tmpArray, uint binWidth, uint binHeight, uint stepSize, uint acceptableArea, out PackingRectangle bounds)
 #if NET5_0_OR_GREATER
         private static bool TryFindBestBin(List<PackingRectangle> emptySpaces, ref Span<PackingRectangle> rectangles,
             ref Span<PackingRectangle> tmpArray, uint binWidth, uint binHeight, uint stepSize, uint acceptableArea, out PackingRectangle bounds)
@@ -181,7 +192,7 @@ namespace RectpackSharp
             {
                 bounds.Width = boundsWidth;
                 bounds.Height = boundsHeight;
-                
+            Span<PackingRectangle> swaptmp = rectangles;
 #if NET5_0_OR_GREATER
                 Span<PackingRectangle> swaptmp = rectangles;
 #elif NETSTANDARD2_0

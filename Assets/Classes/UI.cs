@@ -61,6 +61,11 @@ public class UI : MonoBehaviour
 
     private void CreateCitys()
     {
+        GameObject new_city = Instantiate(city);
+        City script = new_city.GetComponent<City>();
+        script.city_data = years[0].GetCities()[0];
+        script.create_city();
+        /*
         int i = 0;
         foreach (CityObj city_obj in years[0].GetCities())
         {
@@ -70,7 +75,7 @@ public class UI : MonoBehaviour
             script.create_city();
             new_city.transform.position = new Vector3(1000*i, 0, 0);
             i++;
-        }
+        }*/
 
         /*
         foreach (Year year in years)

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
+using RectpackSharp;
 
 public class Grid: MonoBehaviour
 {
@@ -12,8 +13,8 @@ public class Grid: MonoBehaviour
     private float cellSize;
     private int[,] gridArray;
 
-    private int width;
-    private int height;
+    public int width;
+    public int height;
     private int area;
 
     private List<int> houses_area = new List<int>();
@@ -41,10 +42,6 @@ public class Grid: MonoBehaviour
         this.shift_y = shift_y;
         this.cellSize = cellSize;
 
-        this.width = width;
-        this.height = height;
-        this.area = width * height;
-
         this.houses_area = houses_area;     //Wie groﬂ ist welches Haus (klein,mittel,groﬂ)
         this.number_houses = number_houses; //Anzahl der H‰user in den jeweiligen Klassen (klein,mittel,groﬂ)
         this.number_houses_cum_sum = cum_sum(number_houses);
@@ -57,16 +54,27 @@ public class Grid: MonoBehaviour
         this.cube.SetActive (false);
 
         calculate_house_dimensions();
+        PackingRectangle[] rectangles = new PackingRectangle[this.number_houses_cum_sum[2]];
+        for (int i = 0; i < rectangles.Length; i++)
+        {
+            rectangles[i].Width = (uint)choose_house_dimension_width(i);
+            rectangles[i].Height = (uint)choose_house_dimension_height(i);
+            rectangles[i].Id = i;
+        }
 
-        this.height;
-        this.width;
-        this.house_height;
-        this.house_width;
-        this.number_houses;
+        RectanglePacker.Pack(rectangles, out PackingRectangle bounds);
+        house_x = new List<float>(rectangles.Length);
+        house_y = new List<float>(rectangles.Length);
 
-        //calculate_house_positions(); Ist in Python
-        house_x = new List<float> { 6f, 7f, 3f, 3f, 5f, 5f, 0f, 0f};
-        house_y = new List<float> { 0f, 0f, 3f, 5f, 3f, 5f, 6f, 0f};
+        for (int i = 0; i < rectangles.Length; i++)
+        {
+            Debug.Log("x: " + rectangles[i].X + " y: " + rectangles[i].Y + " Height: " + rectangles[i].Height + " Width: " + rectangles[i].Width + " id: " + rectangles[i].Id);
+            house_x.Add(rectangles[i].X);
+            house_y.Add(rectangles[i].Y);
+        }
+        this.width = (int)bounds.Width;
+        this.height = (int)bounds.Height;
+        this.area = width * height;
         place_houses(house_x, house_y);
 
         this.gridArray = new int[width, height];
@@ -141,10 +149,34 @@ public class Grid: MonoBehaviour
         }
     }
 
+    private float choose_house_dimension_width(int i)
+    {
+        for (int j = 0; j < 2; j++)
+        {
+            if (i >= this.number_houses_cum_sum[this.counter] && this.counter < 2)
+            {
+                this.counter++;
+            }
+        }
+        return this.house_width[counter];
+    }
+
+    private float choose_house_dimension_height(int i)
+    {
+        for (int j = 0; j < 2; j++)
+        {
+            if (i >= this.number_houses_cum_sum[this.counter] && this.counter < 2)
+            {
+                this.counter++;
+            }
+        }
+        return this.house_height[counter];
+    }
+
     private GameObject choose_house (int i)
     {
+        this.counter = 0;
         for (int j = 0; j < 2; j++){
-            Debug.Log("i: " + i + " " + this.counter + " cum: " + this.number_houses_cum_sum[this.counter]);
             if (i >= this.number_houses_cum_sum[this.counter] && this.counter < 2)
             {
                 this.counter++;
