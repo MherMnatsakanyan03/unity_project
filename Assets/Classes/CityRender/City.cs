@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using CityData;
-using CityObj = CityData.CityObj;
-using Building_Class = CityData.Building_Class;
 using UnityEngine;
 
 namespace CityRender
