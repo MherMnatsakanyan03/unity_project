@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq.Expressions;
 using CityData;
 using UnityEngine;
@@ -8,6 +9,17 @@ namespace CityRender
 {
     public class City : MonoBehaviour
     {
+
+        public float size_x = 0f;
+        public float size_minus_x = 0f;
+        public float size_y = 0f;
+        public float size_minus_y = 0f;
+
+        public float buffer_size_x = 0f;
+        public float buffer_size_minus_x = 0f;
+        public float buffer_size_y = 0f;
+        public float buffer_size_minus_y = 0f;
+
         public float camera_distance = 0;
         public CityObj city_data;
         private Building_Class building_class;
@@ -33,6 +45,7 @@ namespace CityRender
                 copiedObject.Add(new_district);
             }
             arange_city();
+            Debug.Log("size_x: " + size_x + " size_minus_x: " + size_minus_x + " size_y: " + size_y + " size_minus_y: " + size_minus_y);
         }
 
         private void arange_city()
@@ -90,6 +103,8 @@ namespace CityRender
                         );
                         district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
                         parent_district_scripts.Add(script);
+                        buffer_size_x += script.width;
+                        if (script.height > buffer_size_y) { size_y = script.height; }
                         break;
                     case 2:
                         rotation = 90;
@@ -105,6 +120,8 @@ namespace CityRender
                             rotation
                         );
                         parent_district_scripts.Add(script);
+                        buffer_size_y += script.width;
+                        if (script.height > buffer_size_minus_y) { size_minus_y = script.height; }
                         break;
                     case 3:
                         rotation = 180;
@@ -121,6 +138,8 @@ namespace CityRender
                         );
                         parent_district_scripts.Add(script);
                         camera_distance += script.width;
+                        buffer_size_minus_x += script.width;
+                        if (script.height > buffer_size_minus_y) { size_minus_y = script.height; }
                         break;
                     case 4:
                         rotation = 270;
@@ -136,6 +155,8 @@ namespace CityRender
                             rotation
                         );
                         parent_district_scripts.Add(script);
+                        buffer_size_minus_y += script.width;
+                        if (script.height > buffer_size_x) { size_x = script.height; }
                         break;
                     case 5:
                         rotation = 0;
@@ -151,6 +172,8 @@ namespace CityRender
                             rotation
                         );
                         district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
+                        buffer_size_x += script.width;
+                        if (script.height > buffer_size_y) { size_y = script.height; }
                         break;
                     case 6:
                         rotation = 90;
@@ -168,6 +191,8 @@ namespace CityRender
                             Vector3.up,
                             rotation
                         );
+                        buffer_size_y += script.width;
+                        if (script.height > buffer_size_minus_y) { size_minus_y = script.height; }
                         break;
                     case 7:
                         rotation = 180;
@@ -184,6 +209,8 @@ namespace CityRender
                             rotation
                         );
                         camera_distance += script.width;
+                        buffer_size_minus_x += script.width;
+                        if (script.height > buffer_size_minus_y) { size_minus_y = script.height; }
                         break;
                     case 8:
                         rotation = 270;
@@ -202,6 +229,8 @@ namespace CityRender
                             rotation
                         );
                         parent_district_scripts.Add(script);
+                        buffer_size_minus_y += script.width;
+                        if (script.height > buffer_size_x) { size_x = script.height; }
                         break;
                     default:
                         break;
@@ -209,6 +238,10 @@ namespace CityRender
 
                 i++;
             }
+            if (size_x < buffer_size_x) { size_x = buffer_size_x; }
+            if (size_minus_x < buffer_size_minus_x) { size_minus_x = buffer_size_minus_x; }
+            if (size_y < buffer_size_y) { size_y = buffer_size_y; }
+            if (size_minus_y < buffer_size_minus_y) { size_minus_y = buffer_size_minus_y; }
         }
 
         void Update()
