@@ -1,14 +1,14 @@
-using CityData;
 using System.Collections;
 using System.Collections.Generic;
+using CityData;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
-using CSVReader = CityData.CSVReader;
-using Year = CityData.Year;
 using City = CityRender.City;
-using House = CityRender.House;
+using CSVReader = CityData.CSVReader;
 using EventListener = CityRender.EventListener;
+using House = CityRender.House;
+using Year = CityData.Year;
 
 public class UI : MonoBehaviour
 {
@@ -28,9 +28,14 @@ public class UI : MonoBehaviour
 
     private int currentYearIndex = 0;
     private int currentCityIndex = 0;
+
+    private int currentMode = 0;
     private const int YEAR_OFFSET = 2005;
+
     [SerializeField]
-    private GameObject city;
+    private GameObject initCity;
+
+    private List<List<GameObject>> citiesObject = new();
 
     // Placeholder Cubes, shoukd be replaced with actual city data
     private GameObject[] cubes;
@@ -63,29 +68,53 @@ public class UI : MonoBehaviour
 
     private void CreateCitys()
     {
-        GameObject new_city = Instantiate(city);
-        City script = new_city.GetComponent<City>();
-        script.city_data = years[0].GetCities()[0];
-        script.create_city();
-        Camera.main.transform.position = new Vector3(0, 50, -script.camera_distance - 50);
-        /*
-        int i = 0;
-        foreach (CityObj city_obj in years[0].GetCities())
-        {
-            GameObject new_city = Instantiate(city);
-            City script = new_city.GetComponent<City>();
-            script.city_data = city_obj;
-            script.create_city();
-            new_city.transform.position = new Vector3(1000*i, 0, 0);
-            i++;
-        }*/
-
-        /*
+        int i = 0,
+            j = 0;
         foreach (Year year in years)
         {
-            
-            
-        }*/
+            if (i != 0)
+            {
+                break;
+            }
+            i++;
+            citiesObject.Add(new List<GameObject>());
+
+            foreach (CityObj city_obj in year.GetCities())
+            {
+                if (j != 0)
+                {
+                    break;
+                }
+                j++;
+                GameObject new_city = Instantiate(initCity);
+                City script = new_city.GetComponent<City>();
+                Debug.Log(city_obj.city_id);
+                script.city_data = city_obj;
+                script.create_city();
+                citiesObject[^1].Add(new_city);
+            }
+        }
+        EventListener.current.execute_disableBoxColliderDistrict();
+        EventListener.current.execute_enableBoxColliderHouse();
+        Camera.main.transform.position = new Vector3(
+            0,
+            50,
+            -citiesObject[0][0].GetComponent<City>().camera_distance - 50
+        );
+    }
+
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(0)) // �berpr�fen, ob die linke Maustaste gedr�ckt wurde
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // Erzeugen eines Strahls von der Mausposition
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit)) // �berpr�fen, ob der Strahl ein GameObject getroffen hat
+            {
+                //hit.collider.gameObject.transform
+            }
+        }
     }
 
     /**
@@ -225,10 +254,12 @@ public class UI : MonoBehaviour
     {
         EventListener.current.execute_show_energy_star();
     }
+
     private void show_year_build()
     {
         EventListener.current.execute_show_year_build();
     }
+
     private void show_eui()
     {
         EventListener.current.execute_show_eui();

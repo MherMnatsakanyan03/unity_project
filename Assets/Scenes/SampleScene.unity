@@ -707,6 +707,7 @@ MonoBehaviour:
   width: 0
   height: 0
   street_width: 0
+  districtSquareMeterSize: 40
 --- !u!4 &856079033
 Transform:
   m_ObjectHideFlags: 0
@@ -1070,6 +1071,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bd02b2c4235e2b4bb59a6637c9fb517, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  camera_distance: 0
   district: {fileID: 856079031}
 --- !u!4 &1331657143
 Transform:
@@ -1147,7 +1149,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6473333d4ff9a64ca291e94cd273404, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  city: {fileID: 1331657141}
+  initCity: {fileID: 1331657141}
 --- !u!1 &1862333111
 GameObject:
   m_ObjectHideFlags: 0

@@ -85,6 +85,19 @@ namespace CityRender
                 facility_data.GetHouses()
             );
             //grid.drawOutlines();
+
+            EventListener.current.enableBoxColliderDistrict += enableBoxCollider;
+            EventListener.current.disableBoxColliderDistrict += disableBoxCollider;
+        }
+
+        private void enableBoxCollider()
+        {
+           gameObject.GetComponent<BoxCollider>().enabled = true;
+        }
+
+        private void disableBoxCollider()
+        {
+            gameObject.GetComponent<BoxCollider>().enabled = false;
         }
 
         private void get_house_modells(string house_type_name)
@@ -100,28 +113,6 @@ namespace CityRender
                 if (loadedObject != null)
                 {
                     houses.Add(loadedObject);
-                }
-            }
-        }
-
-        void Start()
-        {
-            //create_district();
-        }
-
-        private void Update()
-        {
-            if (Input.GetMouseButtonDown(0)) // �berpr�fen, ob die linke Maustaste gedr�ckt wurde
-            {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // Erzeugen eines Strahls von der Mausposition
-                RaycastHit hit;
-
-                if (Physics.Raycast(ray, out hit)) // �berpr�fen, ob der Strahl ein GameObject getroffen hat
-                {
-                    if (hit.collider.gameObject == this.gameObject) // �berpr�fen, ob das getroffene GameObject das gew�nschte ist
-                    {
-                        Debug.Log(facility_data.GetCount());
-                    }
                 }
             }
         }

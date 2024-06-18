@@ -14,9 +14,33 @@ namespace CityRender
         public event Action show_year_build;
         public event Action show_eui;
 
+        public event Action enableBoxColliderHouse, disableBoxColliderHouse;
+
+        public event Action enableBoxColliderDistrict, disableBoxColliderDistrict;
+
         public void Awake()
         {
             current = this;
+        }
+
+        public void execute_enableBoxColliderHouse()
+        {
+            enableBoxColliderHouse.Invoke();
+        }
+
+        public void execute_disableBoxColliderHouse()
+        {
+            disableBoxColliderHouse.Invoke();
+        }
+
+        public void execute_enableBoxColliderDistrict()
+        {
+            enableBoxColliderDistrict.Invoke();
+        }
+
+        public void execute_disableBoxColliderDistrict()
+        {
+            disableBoxColliderDistrict.Invoke();
         }
 
         public void execute_show_energy_star()

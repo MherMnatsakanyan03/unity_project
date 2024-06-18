@@ -21,11 +21,7 @@ namespace CityRender
 
         public string house_type;
 
-        public House(
-            Vector3 position,
-            GameObject copy,
-            CityData.House house
-        )
+        public House(Vector3 position, GameObject copy, CityData.House house)
         {
             this.gradient = new Gradient();
             var colors = new GradientColorKey[2];
@@ -47,10 +43,25 @@ namespace CityRender
             this.energy_star = house.GetEnergyStarRating();
             //this.colling_degree_days = house.;
             //this.warming_degree_days = warming_degree_days;
-            
+
+            EventListener.current.enableBoxColliderHouse += enableBoxCollider;
+            EventListener.current.disableBoxColliderHouse += disableBoxCollider;
+
             EventListener.current.show_energy_star += show_energy_star;
             EventListener.current.show_year_build += show_year_build;
             EventListener.current.show_eui += show_eui;
+        }
+
+        private void enableBoxCollider()
+        {
+            //gameObject.GetComponent<BoxCollider>().enabled = true;
+            this.house.GetComponent<BoxCollider>().enabled = true;
+        }
+
+        private void disableBoxCollider()
+        {
+            //gameObject.GetComponent<BoxCollider>().enabled = false;
+            this.house.GetComponent<BoxCollider>().enabled = false;
         }
 
         public GameObject create_house()
