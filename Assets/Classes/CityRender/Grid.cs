@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using CityData;
 using RectpackSharp;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -36,6 +37,8 @@ namespace CityRender
         public float[] shares;
         public int spacing = 2;
 
+        private List<CityData.House> houses;
+
         public Grid(
             Transform parent,
             int width,
@@ -45,13 +48,15 @@ namespace CityRender
             int shift_y,
             List<int> houses_area,
             List<int> number_houses,
-            string house_type
+            string house_type,
+            List<CityData.House> houses
         )
         {
             this.shift_x = shift_x;
             this.shift_y = shift_y;
             this.cellSize = cellSize;
 
+            this.houses = houses;
             this.houses_area = houses_area; //Wie gro� ist welches Haus (klein,mittel,gro�)
             this.number_houses = number_houses; //Anzahl der H�user in den jeweiligen Klassen (klein,mittel,gro�)
             this.number_houses_cum_sum = cum_sum(number_houses);

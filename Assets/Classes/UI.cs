@@ -67,6 +67,7 @@ public class UI : MonoBehaviour
         City script = new_city.GetComponent<City>();
         script.city_data = years[0].GetCities()[0];
         script.create_city();
+        Camera.main.transform.position = new Vector3(0, 50, -script.camera_distance - 50);
         /*
         int i = 0;
         foreach (CityObj city_obj in years[0].GetCities())

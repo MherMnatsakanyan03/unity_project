@@ -81,7 +81,8 @@ namespace CityRender
                 0,
                 houses_area,
                 number_houses,
-                district_type
+                district_type,
+                facility_data.GetHouses()
             );
             //grid.drawOutlines();
         }

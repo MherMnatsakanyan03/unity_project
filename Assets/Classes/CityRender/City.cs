@@ -8,6 +8,7 @@ namespace CityRender
 {
     public class City : MonoBehaviour
     {
+        public float camera_distance = 0;
         public CityObj city_data;
         private Building_Class building_class;
 
@@ -119,6 +120,7 @@ namespace CityRender
                             rotation
                         );
                         parent_district_scripts.Add(script);
+                        camera_distance += script.width;
                         break;
                     case 4:
                         rotation = 270;
@@ -181,6 +183,7 @@ namespace CityRender
                             Vector3.up,
                             rotation
                         );
+                        camera_distance += script.width;
                         break;
                     case 8:
                         rotation = 270;
