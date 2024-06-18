@@ -46,6 +46,29 @@ public class UI : MonoBehaviour
         SetYearDisplay(currentYearIndex);
         CreateCitys();
         FocusCameraOnCity();
+
+        // Set all cities to inactive except the current Year
+        for (int i = 1; i < citiesObject.Count; i++)
+        {
+            citiesObject[i].ForEach(city => city.SetActive(false));
+        }
+
+        // Log all cities
+        string log = "";
+
+        for (int i = 0; i < citiesObject.Count; i++)
+        {
+            log += "Year " + (i + YEAR_OFFSET) + ":\n";
+            for (int j = 0; j < citiesObject[i].Count; j++)
+            {
+                log += "\tCity " + j + ": " + citiesObject[i][j].GetComponent<City>().city_data.city_id + "\n";
+                // Log coordinates
+                log += "\t\tCoordinates: " + citiesObject[i][j].transform.position + "\n";
+            }
+        }
+
+        Debug.Log(log);
+
     }
 
     /* ================================================ Private Functions =============================================== */
@@ -53,46 +76,51 @@ public class UI : MonoBehaviour
     private void CreateCitys()
     {
         int i = 0;
+        Vector2 init_pos = new Vector2(0, 0);
         foreach (Year year in years)
         {
             int j = 0;
             citiesObject.Add(new List<GameObject>());
 
-            Vector2 init_pos = new Vector2(0, 0);
-
             foreach (CityObj city_obj in year.GetCities())
             {
-                GameObject new_city = Instantiate(initCity);
-                City script = new_city.GetComponent<City>();
-                Debug.Log(city_obj.city_id);
-                script.city_data = city_obj;
-                script.create_city();
-                citiesObject[i].Add(new_city);
-
-                if (i != 0)
+                try
                 {
-                    new_city.SetActive(false);
+                    GameObject new_city = Instantiate(initCity);
+                    City script = new_city.GetComponent<City>();
+                    script.city_data = city_obj;
+                    script.create_city();
+
+                    new_city.transform.position = new Vector3(init_pos.x, 0, init_pos.y);
+
+                    var currentCity = new_city.GetComponent<City>();
+                    var city_width = (currentCity.size_x + currentCity.size_minus_x) * 3;
+                    var city_height = (currentCity.size_y + currentCity.size_minus_y) * 3;
+
+                    init_pos.x += Math.Max(city_height, city_width) + 100;
+
+                    citiesObject[i].Add(new_city);
+
+                    if (j > 0)
+                    {
+                        var prevCity = citiesObject[i][j - 1].GetComponent<City>();
+                        var prevCity_width = (prevCity.size_x + prevCity.size_minus_x) * 3;
+                        var prevCity_height = (prevCity.size_y + prevCity.size_minus_y) * 3;
+                        init_pos.x += Math.Max(prevCity_height, prevCity_width) + 100;
+                    }
                 }
-
-                new_city.transform.position = new Vector3(init_pos.x, 0, init_pos.y);
-
-                var currentCity = new_city.GetComponent<City>();
-                var city_width = (currentCity.size_x + currentCity.size_minus_x) * 3;
-                var city_height = (currentCity.size_y + currentCity.size_minus_y) * 3;
-
-                init_pos.x += Math.Max(city_height, city_width) + 100;
-
-                if (j > 0)
+                catch (Exception)
                 {
-                    var prevCity = citiesObject[i][j - 1].GetComponent<City>();
-                    var prevCity_width = (prevCity.size_x + prevCity.size_minus_x) * 3;
-                    var prevCity_height = (prevCity.size_y + prevCity.size_minus_y) * 3;
-                    init_pos.x += Math.Max(prevCity_height, prevCity_width) + 100;
+                    //
                 }
-
-                j++;
+                finally
+                {
+                    j++;
+                }
             }
 
+            init_pos.x = 0;
+            init_pos.y += 1000;
             i++;
         }
         SetModeCity();
@@ -183,7 +211,7 @@ public class UI : MonoBehaviour
             {
                 currentCityIndex = 0;
             }
-           
+
             SetModeCity();
             SetYearDisplay(currentYearIndex);
             FocusCameraOnCity();
