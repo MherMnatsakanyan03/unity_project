@@ -24,11 +24,7 @@ namespace CityRender
         public House(
             Vector3 position,
             GameObject copy,
-            float eui,
-            int year_build,
-            int energy_star,
-            int colling_degree_days,
-            int warming_degree_days
+            CityData.House house
         )
         {
             this.gradient = new Gradient();
@@ -46,13 +42,15 @@ namespace CityRender
 
             this.house_copy = copy;
 
-            this.eui = eui;
-            this.year_build = year_build;
-            this.energy_star = energy_star;
-            this.colling_degree_days = colling_degree_days;
-            this.warming_degree_days = warming_degree_days;
-            Debug.Log(EventListener.current);
+            this.eui = (float)house.GetSiteEUI();
+            this.year_build = house.GetYearBuilt();
+            this.energy_star = house.GetEnergyStarRating();
+            //this.colling_degree_days = house.;
+            //this.warming_degree_days = warming_degree_days;
+            
             EventListener.current.show_energy_star += show_energy_star;
+            EventListener.current.show_year_build += show_year_build;
+            EventListener.current.show_eui += show_eui;
         }
 
         public GameObject create_house()
@@ -63,6 +61,7 @@ namespace CityRender
 
         public void show_energy_star()
         {
+            Debug.Log("clicked 2");
             this.house.GetComponent<Renderer>()
                 .material.SetColor("_Color", this.gradient.Evaluate(this.energy_star / 100f));
         }

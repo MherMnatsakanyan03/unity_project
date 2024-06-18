@@ -7,6 +7,8 @@ using UnityEngine.UIElements;
 using CSVReader = CityData.CSVReader;
 using Year = CityData.Year;
 using City = CityRender.City;
+using House = CityRender.House;
+using EventListener = CityRender.EventListener;
 
 public class UI : MonoBehaviour
 {
@@ -32,6 +34,8 @@ public class UI : MonoBehaviour
 
     // Placeholder Cubes, shoukd be replaced with actual city data
     private GameObject[] cubes;
+
+    private EventListener el;
 
     void OnEnable()
     {
@@ -198,9 +202,9 @@ public class UI : MonoBehaviour
         };
         nextCityButton.clicked += NextCity;
         prevCityButton.clicked += PrevCity;
-        greenBtn.clicked += () => SetCubeTextColor(Color.green);
-        yellowBtn.clicked += () => SetCubeTextColor(Color.yellow);
-        blueBtn.clicked += () => SetCubeTextColor(Color.blue);
+        greenBtn.clicked += show_energy_star;
+        yellowBtn.clicked += show_year_build;
+        blueBtn.clicked += show_eui;
     }
 
     /**
@@ -214,5 +218,18 @@ public class UI : MonoBehaviour
             // Set Text Mesh Pro color
             cube.GetComponent<TMPro.TextMeshPro>().color = color;
         }
+    }
+
+    private void show_energy_star()
+    {
+        EventListener.current.execute_show_energy_star();
+    }
+    private void show_year_build()
+    {
+        EventListener.current.execute_show_year_build();
+    }
+    private void show_eui()
+    {
+        EventListener.current.execute_show_eui();
     }
 }

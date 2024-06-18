@@ -164,11 +164,7 @@ namespace CityRender
                 House house = new House(
                     GetWorldPosition((int)house_x[i], (int)house_y[i]),
                     this.house_copy,
-                    200f,
-                    1995,
-                    UnityEngine.Random.Range(0, 101),
-                    10,
-                    10
+                    this.houses[i]
                 );
                 GameObject t = house.create_house();
                 t.SetActive(true);

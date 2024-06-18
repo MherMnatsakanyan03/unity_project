@@ -11,10 +11,25 @@ namespace CityRender
     {
         public static EventListener current;
         public event Action show_energy_star;
+        public event Action show_year_build;
+        public event Action show_eui;
 
         public void Awake()
         {
             current = this;
+        }
+
+        public void execute_show_energy_star()
+        {
+            show_energy_star.Invoke();
+        }
+        public void execute_show_year_build()
+        {
+            show_year_build.Invoke();
+        }
+        public void execute_show_eui()
+        {
+            show_eui.Invoke();
         }
 
         void Update()
