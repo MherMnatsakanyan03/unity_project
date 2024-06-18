@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace CityRender
 {
@@ -67,6 +68,16 @@ namespace CityRender
         public GameObject create_house()
         {
             this.house = Instantiate(this.house_copy, this.position, Quaternion.identity);
+            this.house.AddComponent<CityRender.house_data>();
+            house_data script = this.house.GetComponent<CityRender.house_data>();
+            script.eui = this.eui;
+            script.year_build = this.year_build;
+            script.energy_star = this.energy_star;
+            script.colling_degree_days = this.colling_degree_days;
+            script.warming_degree_days = this.warming_degree_days;
+            script.relativ_eui = this.relativ_eui;
+            script.relativ_year_build = this.relativ_year_build;
+
             return this.house;
         }
 
