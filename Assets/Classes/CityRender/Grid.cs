@@ -171,6 +171,7 @@ namespace CityRender
                     this.house_copy,
                     this.houses[i]
                 );
+                house.house_type = house_type;
                 GameObject t = house.create_house();
                 t.SetActive(true);
                 t.transform.SetParent(parent);

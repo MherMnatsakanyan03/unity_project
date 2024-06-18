@@ -77,7 +77,7 @@ namespace CityRender
             script.warming_degree_days = this.warming_degree_days;
             script.relativ_eui = this.relativ_eui;
             script.relativ_year_build = this.relativ_year_build;
-            //script.house_type = this.house_type;
+            script.house_type = this.house_type;
 
             return this.house;
         }
