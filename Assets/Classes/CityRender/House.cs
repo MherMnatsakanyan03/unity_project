@@ -68,8 +68,8 @@ namespace CityRender
         public GameObject create_house()
         {
             this.house = Instantiate(this.house_copy, this.position, Quaternion.identity);
-            this.house.AddComponent<CityRender.house_data>();
-            house_data script = this.house.GetComponent<CityRender.house_data>();
+            this.house.AddComponent<CityRender.House_data>();
+            House_data script = this.house.GetComponent<CityRender.House_data>();
             script.eui = this.eui;
             script.year_build = this.year_build;
             script.energy_star = this.energy_star;
@@ -77,6 +77,7 @@ namespace CityRender
             script.warming_degree_days = this.warming_degree_days;
             script.relativ_eui = this.relativ_eui;
             script.relativ_year_build = this.relativ_year_build;
+            //script.house_type = this.house_type;
 
             return this.house;
         }
