@@ -154,7 +154,7 @@ namespace CityRender
                 GameObject t = house.create_house();
                 t.SetActive(true);
                 t.transform.SetParent(parent);
-                t.tag = house_type;
+                //t.tag = house_type;
             }
         }
 
