@@ -28,9 +28,9 @@ namespace CityRender
         {
             List<int> houses_area = new List<int>
                 {
-                (int)facility_data.GetThreshoulds(0) / 100000,
-                (int)facility_data.GetThreshoulds(1) / 100000,
-                (int)facility_data.GetThreshoulds(2) / 100000
+                (int)facility_data.GetThreshoulds(0) / 10000,
+                (int)facility_data.GetThreshoulds(1) / 10000,
+                (int)facility_data.GetThreshoulds(2) / 10000
                 };
             List<int> number_houses = new List<int>
                 {

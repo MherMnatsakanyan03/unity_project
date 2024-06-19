@@ -73,9 +73,6 @@ namespace CityRender
                 rectangles[i].Width = (uint)choose_house_dimension_width(i);
                 rectangles[i].Height = (uint)choose_house_dimension_height(i);
                 rectangles[i].Id = i;
-
-                Debug.Log(this.houses_area[0] + " " + this.houses_area[1] + " " + this.houses_area[2]);
-                Debug.Log("w: " + rectangles[i].Width + " h: " + rectangles[i].Height);
             }
             
 
