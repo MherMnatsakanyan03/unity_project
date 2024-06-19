@@ -98,10 +98,6 @@ public class UI : MonoBehaviour
         Vector2 init_pos = new Vector2(0, 0);
         foreach (Year year in years)
         {
-            if (i == 1)
-            {
-                break;
-            }
             int j = 0;
             citiesObject.Add(new List<GameObject>());
             offsets.Add(new List<float>());

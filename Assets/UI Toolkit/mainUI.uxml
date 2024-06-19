@@ -22,7 +22,7 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="VisualElement" style="flex-grow: 1; flex-direction: row; align-items: stretch; justify-content: center; height: 25%;">
-                <ui:ListView name="house_data_list" style="background-color: rgba(255, 255, 255, 0.91);" />
+                <ui:ListView name="house_data_list" style="background-color: rgba(255, 255, 255, 0.91); align-self: flex-end;" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="bottomRow" style="flex-grow: 1; flex-direction: row;">
