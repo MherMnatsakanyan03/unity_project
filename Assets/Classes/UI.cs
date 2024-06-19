@@ -26,8 +26,12 @@ public class UI : MonoBehaviour
     private Label upper_limit_colorbar;
     private Label bottom_limit_colorbar;
 
+    private ListView house_data_list;
+
     private CSVReader csvReader;
     private List<Year> years;
+
+    private List<List<float>> offsets = new();
 
     private int currentYearIndex = 0;
     private int currentCityIndex = 0;
@@ -52,7 +56,6 @@ public class UI : MonoBehaviour
         CreateCitys();
         FocusCameraOnCity();
         diable_colorbar();
-
 
         // Log all cities
         string log = "";
@@ -80,15 +83,14 @@ public class UI : MonoBehaviour
 
     private void CreateTest()
     {
-                citiesObject.Add(new List<GameObject>());
-                CityObj city_obj = years[0].GetCities()[0];
-                GameObject new_city = Instantiate(initCity);
-                City script = new_city.GetComponent<City>();
-                script.city_data = city_obj;
-                script.create_city();
-                citiesObject[0].Add(new_city);
+        citiesObject.Add(new List<GameObject>());
+        CityObj city_obj = years[0].GetCities()[0];
+        GameObject new_city = Instantiate(initCity);
+        City script = new_city.GetComponent<City>();
+        script.city_data = city_obj;
+        script.create_city();
+        citiesObject[0].Add(new_city);
     }
-
 
     private void CreateCitys()
     {
@@ -96,38 +98,47 @@ public class UI : MonoBehaviour
         Vector2 init_pos = new Vector2(0, 0);
         foreach (Year year in years)
         {
+            if (i == 1)
+            {
+                break;
+            }
             int j = 0;
             citiesObject.Add(new List<GameObject>());
+            offsets.Add(new List<float>());
 
+            offsets[i].Add(init_pos.x);
             foreach (CityObj city_obj in year.GetCities())
             {
-                    GameObject new_city = Instantiate(initCity);
-                    City script = new_city.GetComponent<City>();
-                    script.city_data = city_obj;
-                    script.create_city();
+                GameObject new_city = Instantiate(initCity);
+                City script = new_city.GetComponent<City>();
+                script.city_data = city_obj;
+                script.create_city();
 
-                    new_city.transform.position = new Vector3(init_pos.x, 0, init_pos.y);
+                new_city.transform.position = new Vector3(init_pos.x, 0, init_pos.y);
 
-                    var currentCity = new_city.GetComponent<City>();
-                    var city_width = (currentCity.size_x + currentCity.size_minus_x) * 3;
-                    var city_height = (currentCity.size_y + currentCity.size_minus_y) * 3;
+                var currentCity = new_city.GetComponent<City>();
+                var city_width = (currentCity.size_x + currentCity.size_minus_x) * 3;
+                var city_height = (currentCity.size_y + currentCity.size_minus_y) * 3;
 
-                    init_pos.x += Math.Max(city_height, city_width) + 100;
+                init_pos.x += Math.Max(city_height, city_width) + 100;
 
-                    if (i != 0)
-                    {
-                        new_city.SetActive(false);
-                    }
+                if (i != 0)
+                {
+                    new_city.SetActive(false);
+                }
 
-                    citiesObject[i].Add(new_city);
+                citiesObject[i].Add(new_city);
 
-                    if (j > 0)
-                    {
-                        var prevCity = citiesObject[i][j - 1].GetComponent<City>();
-                        var prevCity_width = (prevCity.size_x + prevCity.size_minus_x) * 3;
-                        var prevCity_height = (prevCity.size_y + prevCity.size_minus_y) * 3;
-                        init_pos.x += Math.Max(prevCity_height, prevCity_width) + 100;
-                    }
+                if (j > 0)
+                {
+                    var prevCity = citiesObject[i][j - 1].GetComponent<City>();
+                    var prevCity_width = (prevCity.size_x + prevCity.size_minus_x) * 3;
+                    var prevCity_height = (prevCity.size_y + prevCity.size_minus_y) * 3;
+                    init_pos.x += Math.Max(prevCity_height, prevCity_width) + 100;
+                }
+
+                offsets[i].Add(init_pos.x);
+
                 j++;
             }
 
@@ -170,6 +181,38 @@ public class UI : MonoBehaviour
                         "Current House: "
                             + hit.collider.gameObject.GetComponent<House_data>().house_type
                     );
+                    // Set UI to show house data
+
+                    var house_type = hit.collider.gameObject.GetComponent<House_data>().house_type;
+                    var eui = hit.collider.gameObject.GetComponent<House_data>().eui;
+                    var year = hit.collider.gameObject.GetComponent<House_data>().year_build;
+                    var energy_star = hit
+                        .collider.gameObject.GetComponent<House_data>()
+                        .energy_star;
+
+                    /* house_data_list.hierarchy.Add(new Label("House Type: " + house_type));
+                    house_data_list.hierarchy.Add(new Label("Year Build: " + year));
+                    house_data_list.hierarchy.Add(new Label("EUI: " + eui));
+                    house_data_list.hierarchy.Add(new Label("Energy Star: " + energy_star)); */
+
+                    List<string> items = new List<string>
+                    {
+                        "House Type: " + house_type,
+                        "Year Build: " + year,
+                        "EUI: " + eui,
+                        "Energy Star: " + energy_star
+                    };
+
+                    // Define a function to create UI elements
+                    VisualElement makeItem() => new Label();
+
+                    // Bind data to UI elements
+                    void bindItem(VisualElement e, int i) => (e as Label).text = items[i];
+
+                    // Set the data source and callbacks
+                    house_data_list.itemsSource = items;
+                    house_data_list.makeItem = makeItem;
+                    house_data_list.bindItem = bindItem;
                 }
             }
         }
@@ -337,6 +380,7 @@ public class UI : MonoBehaviour
 
         // Calculate the dimensions of the collider
         var districtData = district.GetComponent<District>();
+        var middle = districtData.position;
         float width = districtData.width;
         float height = districtData.height;
 
@@ -349,9 +393,9 @@ public class UI : MonoBehaviour
 
         // Set the camera position directly above the object
         Camera.main.transform.position = new Vector3(
-            district.transform.position.x,
+            middle.x + offsets[currentYearIndex][currentCityIndex],
             distance,
-            district.transform.position.z // Assuming 2D (X-Z plane)
+            middle.z + currentYearIndex * 1000 // Assuming 2D (X-Z plane)
         );
     }
 
@@ -410,6 +454,7 @@ public class UI : MonoBehaviour
         greenBtn = root.Q<Button>("btn1");
         yellowBtn = root.Q<Button>("btn2");
         blueBtn = root.Q<Button>("btn3");
+        house_data_list = root.Q<ListView>("house_data_list");
 
         upper_limit_colorbar = root.Q<Label>("UpperLimit");
         bottom_limit_colorbar = root.Q<Label>("BottomLimit");
@@ -454,15 +499,30 @@ public class UI : MonoBehaviour
         };
         nextCityButton.clicked += NextCity;
         prevCityButton.clicked += PrevCity;
-        greenBtn.clicked += () => { show_energy_star(); enable_colorbar(); change_text("100 %", "0"); };
-        yellowBtn.clicked += () => { show_year_build(); enable_colorbar(); };
-        blueBtn.clicked += () => { show_eui(); enable_colorbar(); };
+        greenBtn.clicked += () =>
+        {
+            show_energy_star();
+            enable_colorbar();
+            change_text("100 %", "0");
+        };
+        yellowBtn.clicked += () =>
+        {
+            show_year_build();
+            enable_colorbar();
+        };
+        blueBtn.clicked += () =>
+        {
+            show_eui();
+            enable_colorbar();
+        };
     }
 
     private void SetModeCity()
     {
         EventListener.current.execute_enableBoxColliderDistrict();
         EventListener.current.execute_disableBoxColliderHouse();
+
+        house_data_list.itemsSource = null; // Reassign the itemsSource
 
         currentMode = 0;
     }
@@ -471,6 +531,8 @@ public class UI : MonoBehaviour
     {
         EventListener.current.execute_disableBoxColliderDistrict();
         EventListener.current.execute_enableBoxColliderHouse();
+
+        house_data_list.itemsSource = null; // Reassign the itemsSource
 
         currentMode = 1;
     }

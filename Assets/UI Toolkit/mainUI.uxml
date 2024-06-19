@@ -21,7 +21,9 @@
                     <ui:Label tabindex="-1" text="0" parse-escape-sequences="true" display-tooltip-when-elided="true" name="BottomLimit" style="-unity-text-align: middle-center; -unity-font-style: bold; font-size: 16px;" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="VisualElement" style="flex-grow: 1; flex-direction: row; align-items: stretch; justify-content: center;" />
+            <ui:VisualElement name="VisualElement" style="flex-grow: 1; flex-direction: row; align-items: stretch; justify-content: center; height: 25%;">
+                <ui:ListView name="house_data_list" style="background-color: rgba(255, 255, 255, 0.91);" />
+            </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="bottomRow" style="flex-grow: 1; flex-direction: row;">
             <ui:Button parse-escape-sequences="true" display-tooltip-when-elided="true" name="prevCity" class="switchButton" style="rotate: 180deg; width: 10%; -unity-font-style: normal; border-top-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; border-bottom-left-radius: 0; -unity-background-image-tint-color: rgb(32, 56, 100); white-space: nowrap; -unity-text-align: middle-left;" />
