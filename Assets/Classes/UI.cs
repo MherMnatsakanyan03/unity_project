@@ -47,12 +47,6 @@ public class UI : MonoBehaviour
         CreateCitys();
         FocusCameraOnCity();
 
-        // Set all cities to inactive except the current Year
-        for (int i = 1; i < citiesObject.Count; i++)
-        {
-            citiesObject[i].ForEach(city => city.SetActive(false));
-        }
-
         // Log all cities
         string log = "";
 
@@ -61,14 +55,18 @@ public class UI : MonoBehaviour
             log += "Year " + (i + YEAR_OFFSET) + ":\n";
             for (int j = 0; j < citiesObject[i].Count; j++)
             {
-                log += "\tCity " + j + ": " + citiesObject[i][j].GetComponent<City>().city_data.city_id + "\n";
+                log +=
+                    "\tCity "
+                    + j
+                    + ": "
+                    + citiesObject[i][j].GetComponent<City>().city_data.city_id
+                    + "\n";
                 // Log coordinates
                 log += "\t\tCoordinates: " + citiesObject[i][j].transform.position + "\n";
             }
         }
 
         Debug.Log(log);
-
     }
 
     /* ================================================ Private Functions =============================================== */
@@ -98,6 +96,11 @@ public class UI : MonoBehaviour
                     var city_height = (currentCity.size_y + currentCity.size_minus_y) * 3;
 
                     init_pos.x += Math.Max(city_height, city_width) + 100;
+
+                    if (i != 0)
+                    {
+                        new_city.SetActive(false);
+                    }
 
                     citiesObject[i].Add(new_city);
 
@@ -291,15 +294,25 @@ public class UI : MonoBehaviour
         var currentGameObject = citiesObject[currentYearIndex][currentCityIndex];
         var currentCity = currentGameObject.GetComponent<City>();
         var alpha = Camera.main.fieldOfView / 2;
-        var city_width = currentCity.size_x + currentCity.size_minus_x;
-        var city_height = currentCity.size_y + currentCity.size_minus_y;
-        var a = Math.Max(city_width, city_height) / 2;
-        var distance = a / Mathf.Tan(alpha * Mathf.Deg2Rad);
+        var city_width = Math.Max(currentCity.size_x + currentCity.size_minus_x, 100);
+        var city_height = Math.Max(currentCity.size_y + currentCity.size_minus_y, 100);
+        var a = Math.Max(city_width, city_height);
+        var distance = 0.8f * a / Mathf.Tan(alpha * Mathf.Deg2Rad);
+
+        distance = Math.Min(distance, 990);
 
         Camera.main.transform.position = new Vector3(
             currentGameObject.transform.position.x,
             distance,
-            currentGameObject.transform.position.z
+            currentGameObject.transform.position.z + 30
+        );
+        Debug.Log(
+            "New Pos: "
+                + currentGameObject.transform.position.x
+                + ", "
+                + currentGameObject.transform.position.z
+                + ", Distance: "
+                + distance
         );
     }
 
@@ -322,10 +335,12 @@ public class UI : MonoBehaviour
         var a = Mathf.Max(width, height) / 2;
         var distance = a / Mathf.Tan(alpha * Mathf.Deg2Rad);
 
+        distance = Math.Min(distance, 990);
+
         // Set the camera position directly above the object
         Camera.main.transform.position = new Vector3(
             district.transform.position.x,
-            distance + 20,
+            distance,
             district.transform.position.z // Assuming 2D (X-Z plane)
         );
     }
@@ -341,18 +356,21 @@ public class UI : MonoBehaviour
 
         // Calculate the dimensions of the collider
         Vector3 colliderSize = collider.bounds.size;
-        float width = colliderSize.x;
-        float height = colliderSize.z;
+        float width = Math.Max(colliderSize.x, 50);
+        float height = Math.Max(colliderSize.z, 50);
 
         // Calculate the distance from the object for camera positioning
         var alpha = Camera.main.fieldOfView / 2;
         var a = Mathf.Max(width, height) / 2;
         var distance = a / Mathf.Tan(alpha * Mathf.Deg2Rad);
 
+        distance = Math.Min(distance, 990);
+        distance = Math.Max(distance, 50);
+
         // Set the camera position directly above the object
         Camera.main.transform.position = new Vector3(
             obj.transform.position.x,
-            distance + 20,
+            distance,
             obj.transform.position.z // Assuming 2D (X-Z plane)
         );
     }
