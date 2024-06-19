@@ -247,7 +247,7 @@ public class UI : MonoBehaviour
      */
     private void NextYear()
     {
-        if (currentYearIndex < citiesObject.Count - 1)
+        if (currentYearIndex < citiesObject.Count - 1 && currentMode == 0)
         {
             Debug.Log("Year: " + currentYearIndex + ",\tCity: " + currentCityIndex);
             var oldCity = citiesObject[currentYearIndex][currentCityIndex];
@@ -278,7 +278,7 @@ public class UI : MonoBehaviour
      */
     private void PrevYear()
     {
-        if (currentYearIndex > 0)
+        if (currentYearIndex > 0 && currentMode == 0)
         {
             Debug.Log("Year: " + currentYearIndex + ",\tCity: " + currentCityIndex);
 
@@ -319,7 +319,7 @@ public class UI : MonoBehaviour
      */
     private void NextCity()
     {
-        if (currentCityIndex < citiesObject[currentYearIndex].Count - 1)
+        if (currentCityIndex < citiesObject[currentYearIndex].Count - 1 && currentMode == 0)
         {
             currentCityIndex++;
             FocusCameraOnCity();
@@ -331,7 +331,7 @@ public class UI : MonoBehaviour
      */
     private void PrevCity()
     {
-        if (currentCityIndex > 0)
+        if (currentCityIndex > 0 && currentMode == 0)
         {
             currentCityIndex--;
             FocusCameraOnCity();
