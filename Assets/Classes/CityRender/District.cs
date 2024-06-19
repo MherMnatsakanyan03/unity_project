@@ -16,6 +16,7 @@ namespace CityRender
         private List<GameObject> houses = new List<GameObject>();
         public string district_type = "Warehouse";
 
+        public Vector3 position;
         public float width;
         public float height;
         public float street_width;

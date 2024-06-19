@@ -45,7 +45,6 @@ namespace CityRender
                 copiedObject.Add(new_district);
             }
             arange_city();
-            Debug.Log("size_x: " + size_x + " size_minus_x: " + size_minus_x + " size_y: " + size_y + " size_minus_y: " + size_minus_y);
         }
 
         private void arange_city()
@@ -88,6 +87,7 @@ namespace CityRender
                 switch (i)
                 {
                     case 0:
+                        script.position = district.transform.position + new Vector3(0,0,district.GetComponent<BoxCollider>().center.z);
                         break;
                     case 1:
                         rotation = 0;
@@ -105,6 +105,7 @@ namespace CityRender
                         parent_district_scripts.Add(script);
                         buffer_size_x += script.width;
                         if (script.height > buffer_size_y) { size_y = script.height; }
+                        script.position = district.transform.position + new Vector3(0, 0, district.GetComponent<BoxCollider>().center.z);
                         break;
                     case 2:
                         rotation = 90;
@@ -122,6 +123,7 @@ namespace CityRender
                         parent_district_scripts.Add(script);
                         buffer_size_y += script.width;
                         if (script.height > buffer_size_minus_y) { size_minus_y = script.height; }
+                        script.position = district.transform.position + new Vector3(district.GetComponent<BoxCollider>().center.z, 0, 0);
                         break;
                     case 3:
                         rotation = 180;
@@ -140,6 +142,7 @@ namespace CityRender
                         camera_distance += script.width;
                         buffer_size_minus_x += script.width;
                         if (script.height > buffer_size_minus_y) { size_minus_y = script.height; }
+                        script.position = district.transform.position + new Vector3(0, 0, -district.GetComponent<BoxCollider>().center.z);
                         break;
                     case 4:
                         rotation = 270;
@@ -157,6 +160,7 @@ namespace CityRender
                         parent_district_scripts.Add(script);
                         buffer_size_minus_y += script.width;
                         if (script.height > buffer_size_x) { size_x = script.height; }
+                        script.position = district.transform.position + new Vector3(-district.GetComponent<BoxCollider>().center.z, 0, 0);
                         break;
                     case 5:
                         rotation = 0;
@@ -174,6 +178,7 @@ namespace CityRender
                         district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
                         buffer_size_x += script.width;
                         if (script.height > buffer_size_y) { size_y = script.height; }
+                        script.position = district.transform.position + new Vector3(0, 0, district.GetComponent<BoxCollider>().center.z);
                         break;
                     case 6:
                         rotation = 90;
@@ -193,6 +198,7 @@ namespace CityRender
                         );
                         buffer_size_y += script.width;
                         if (script.height > buffer_size_minus_y) { size_minus_y = script.height; }
+                        script.position = district.transform.position + new Vector3(district.GetComponent<BoxCollider>().center.z, 0, 0);
                         break;
                     case 7:
                         rotation = 180;
@@ -211,6 +217,7 @@ namespace CityRender
                         camera_distance += script.width;
                         buffer_size_minus_x += script.width;
                         if (script.height > buffer_size_minus_y) { size_minus_y = script.height; }
+                        script.position = district.transform.position + new Vector3(0, 0, -district.GetComponent<BoxCollider>().center.z);
                         break;
                     case 8:
                         rotation = 270;
@@ -231,6 +238,8 @@ namespace CityRender
                         parent_district_scripts.Add(script);
                         buffer_size_minus_y += script.width;
                         if (script.height > buffer_size_x) { size_x = script.height; }
+                        script.position = district.transform.position + new Vector3(-district.GetComponent<BoxCollider>().center.z, 0, 0);
+                        Debug.Log("pos:" + script.position);
                         break;
                     default:
                         break;
