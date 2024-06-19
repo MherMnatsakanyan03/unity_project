@@ -57,7 +57,9 @@ namespace CityRender
             float rotate_y = 0;
             float rotation = 0;
             District parten_district_script = null;
+            GameObject parten_district = null;
             List<District> parent_district_scripts = new List<District>();
+            List<GameObject> parent_districts = new List<GameObject>();
             int i = 0;
             foreach (GameObject district in copiedObject)
             {
@@ -76,12 +78,13 @@ namespace CityRender
                     script.width / 2 - script.street_width / 2
                 );
 
-                var width = 0 - script.street_width / 2;
+                var width = -script.width/2 + district.GetComponent<BoxCollider>().center.z;
                 var height = -script.height / 2;
 
                 if (i == 0)
                 {
                     parten_district_script = script;
+                    parten_district = district;
                 }
 
                 switch (i)
@@ -91,11 +94,12 @@ namespace CityRender
                         break;
                     case 1:
                         rotation = 0;
-                        new_postion_x = -parten_district_script.width + script.street_width / 2;
-                        new_postion_y = parten_district_script.height / 2;
+                        new_postion_x = -parten_district_script.height/2 ;
+                        new_postion_y = parten_district_script.width / 2 + parten_district.GetComponent<BoxCollider>().center.z;
                         shift_x = new_postion_x - height;
                         shift_y = new_postion_y - width;
-
+                        //shift_x = 0;
+                        //shift_y = 0;
                         district.transform.RotateAround(
                             new Vector3(rotate_x, 0, rotate_y),
                             Vector3.up,
@@ -103,14 +107,15 @@ namespace CityRender
                         );
                         district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
                         parent_district_scripts.Add(script);
+                        parent_districts.Add(district);
                         buffer_size_x += script.width;
                         if (script.height > buffer_size_y) { size_y = script.height; }
                         script.position = district.transform.position + new Vector3(0, 0, district.GetComponent<BoxCollider>().center.z);
                         break;
                     case 2:
                         rotation = 90;
-                        new_postion_x = parten_district_script.width - script.street_width / 2;
-                        new_postion_y = parten_district_script.height / 2;
+                        new_postion_x = parten_district_script.height / 2;
+                        new_postion_y = parten_district_script.width / 2 + parten_district.GetComponent<BoxCollider>().center.z;
                         shift_x = new_postion_x - height;
                         shift_y = new_postion_y - width;
 
@@ -121,14 +126,15 @@ namespace CityRender
                             rotation
                         );
                         parent_district_scripts.Add(script);
+                        parent_districts.Add(district);
                         buffer_size_y += script.width;
                         if (script.height > buffer_size_minus_y) { size_minus_y = script.height; }
                         script.position = district.transform.position + new Vector3(district.GetComponent<BoxCollider>().center.z, 0, 0);
                         break;
                     case 3:
                         rotation = 180;
-                        new_postion_x = parten_district_script.width - script.street_width / 2;
-                        new_postion_y = 0 - script.street_width / 2;
+                        new_postion_x = parten_district_script.height / 2;
+                        new_postion_y = -parten_district_script.width / 2 + parten_district.GetComponent<BoxCollider>().center.z;
                         shift_x = new_postion_x - height;
                         shift_y = new_postion_y - width;
 
@@ -139,6 +145,7 @@ namespace CityRender
                             rotation
                         );
                         parent_district_scripts.Add(script);
+                        parent_districts.Add(district);
                         camera_distance += script.width;
                         buffer_size_minus_x += script.width;
                         if (script.height > buffer_size_minus_y) { size_minus_y = script.height; }
@@ -146,8 +153,8 @@ namespace CityRender
                         break;
                     case 4:
                         rotation = 270;
-                        new_postion_x = -parten_district_script.width + script.street_width / 2;
-                        new_postion_y = 0 - script.street_width / 2;
+                        new_postion_x = -parten_district_script.height / 2;
+                        new_postion_y = -parten_district_script.width / 2 + parten_district.GetComponent<BoxCollider>().center.z;
                         shift_x = new_postion_x - height;
                         shift_y = new_postion_y - width;
 
@@ -158,15 +165,15 @@ namespace CityRender
                             rotation
                         );
                         parent_district_scripts.Add(script);
+                        parent_districts.Add(district);
                         buffer_size_minus_y += script.width;
                         if (script.height > buffer_size_x) { size_x = script.height; }
                         script.position = district.transform.position + new Vector3(-district.GetComponent<BoxCollider>().center.z, 0, 0);
                         break;
                     case 5:
                         rotation = 0;
-                        new_postion_x = -parten_district_script.width + script.street_width / 2;
-                        new_postion_y =
-                            parten_district_script.height / 2 + parent_district_scripts[0].width;
+                        new_postion_x = -parten_district_script.height / 2;
+                        new_postion_y = parent_district_scripts[0].width + parten_district_script.width / 2 + parten_district.GetComponent<BoxCollider>().center.z;
                         shift_x = new_postion_x - height;
                         shift_y = new_postion_y - width;
 
@@ -182,11 +189,8 @@ namespace CityRender
                         break;
                     case 6:
                         rotation = 90;
-                        new_postion_x =
-                            parten_district_script.width
-                            - script.street_width / 2
-                            + parent_district_scripts[1].width;
-                        new_postion_y = parten_district_script.height / 2;
+                        new_postion_x = parent_district_scripts[1].width + parten_district_script.height / 2;
+                        new_postion_y = parten_district_script.width / 2 + parten_district.GetComponent<BoxCollider>().center.z;
                         shift_x = new_postion_x - height;
                         shift_y = new_postion_y - width;
 
@@ -202,9 +206,8 @@ namespace CityRender
                         break;
                     case 7:
                         rotation = 180;
-                        new_postion_x = parten_district_script.width - script.street_width / 2;
-                        new_postion_y =
-                            0 - script.street_width / 2 - parent_district_scripts[2].width;
+                        new_postion_x = parten_district_script.height/2;
+                        new_postion_y = -parent_district_scripts[2].width - parten_district_script.width / 2 + parten_district.GetComponent<BoxCollider>().center.z;
                         shift_x = new_postion_x - height;
                         shift_y = new_postion_y - width;
 
@@ -221,11 +224,8 @@ namespace CityRender
                         break;
                     case 8:
                         rotation = 270;
-                        new_postion_x =
-                            -parten_district_script.width
-                            + script.street_width / 2
-                            - parent_district_scripts[3].width;
-                        new_postion_y = 0 - script.street_width / 2;
+                        new_postion_x = -parent_district_scripts[3].width - parten_district_script.height / 2;
+                        new_postion_y = -parten_district_script.width / 2 + parten_district.GetComponent<BoxCollider>().center.z;
                         shift_x = new_postion_x - height;
                         shift_y = new_postion_y - width;
 
@@ -239,7 +239,6 @@ namespace CityRender
                         buffer_size_minus_y += script.width;
                         if (script.height > buffer_size_x) { size_x = script.height; }
                         script.position = district.transform.position + new Vector3(-district.GetComponent<BoxCollider>().center.z, 0, 0);
-                        Debug.Log("pos:" + script.position);
                         break;
                     default:
                         break;

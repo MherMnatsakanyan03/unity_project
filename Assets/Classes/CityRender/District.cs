@@ -26,15 +26,34 @@ namespace CityRender
 
         public void create_district()
         {
-            districtSquareMeterSize = (int)facility_data.GetTotalArea() / 100000;
-            Debug.Log("districtSquareMeterSize: "+ (int)districtSquareMeterSize);
-            float randomNumber = 0.5f;
-            var b = (int)Mathf.Sqrt(districtSquareMeterSize / randomNumber) * 10;
-            var a = (int)(randomNumber * b);
+            List<int> houses_area = new List<int>
+                {
+                (int)facility_data.GetThreshoulds(0) / 100000,
+                (int)facility_data.GetThreshoulds(1) / 100000,
+                (int)facility_data.GetThreshoulds(2) / 100000
+                };
+            List<int> number_houses = new List<int>
+                {
+                (int)facility_data.GetCountPart(0),
+                (int)facility_data.GetCountPart(1),
+                (int)facility_data.GetCountPart(2)
+                };
+
+            Grid grid = new Grid(
+                    gameObject.transform,
+                    1,
+                    0,
+                    0,
+                    houses_area,
+                    number_houses,
+                    district_type,
+                    facility_data.GetHouses()
+                );
+
 
             this.street_width = street_original.GetComponent<Renderer>().bounds.size.x;
-            this.width = a + street_width;
-            this.height = b + street_width;
+            this.width = grid.width + street_width;
+            this.height = grid.height + street_width;
 
             if(districtSquareMeterSize != 0)
             {
@@ -44,8 +63,8 @@ namespace CityRender
                         gameObject,
                         street_original,
                         street_edge_original,
-                        a,
-                        b
+                        grid.width,
+                        grid.height
                     );
                 for (int i = 0; i < streetMatricesN.Count; i++)
                 {
@@ -64,30 +83,8 @@ namespace CityRender
 
                 //Create Houses
                 //get_house_modells(district_type);
-                List<int> houses_area = new List<int>
-                {
-                (int)facility_data.GetThreshoulds(0) / 100000,
-                (int)facility_data.GetThreshoulds(1) / 100000,
-                (int)facility_data.GetThreshoulds(2) / 100000
-                };
-                List<int> number_houses = new List<int>
-                {
-                (int)facility_data.GetCountPart(0),
-                (int)facility_data.GetCountPart(1),
-                (int)facility_data.GetCountPart(2)
-                };
-                Grid grid = new Grid(
-                    gameObject.transform,
-                    (int)(b),
-                    (int)(a),
-                    1,
-                    -(int)(a),
-                    0,
-                    houses_area,
-                    number_houses,
-                    district_type,
-                    facility_data.GetHouses()
-                );
+
+                
                 //grid.drawOutlines();
 
                 EventListener.current.enableBoxColliderDistrict += enableBoxCollider;

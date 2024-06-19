@@ -41,8 +41,6 @@ namespace CityRender
 
         public Grid(
             Transform parent,
-            int width,
-            int height,
             float cellSize,
             int shift_x,
             int shift_y,
@@ -92,10 +90,11 @@ namespace CityRender
             }
             this.width = (int)bounds.Width;
             this.height = (int)bounds.Height;
-            this.area = width * height;
+            this.shift_x = -this.width / 2;
+            this.area = this.width * this.height;
             place_houses(house_x, house_y);
 
-            this.gridArray = new int[width, height];
+            this.gridArray = new int[this.width, this.height];
             fill_array(this.gridArray);
         }
 
@@ -215,13 +214,13 @@ namespace CityRender
 
         private Vector3 GetWorldPosition(int x, int y)
         {
-            var width = this.house_copy.GetComponent<Renderer>().bounds.size.x;
-            var height = this.house_copy.GetComponent<Renderer>().bounds.size.y;
+            var house_width = this.house_copy.GetComponent<Renderer>().bounds.size.x;
+            var house_height = this.house_copy.GetComponent<Renderer>().bounds.size.y;
             var size = this.house_copy.GetComponent<Renderer>().bounds.size.z;
             return new Vector3(
-                    x + this.shift_x + width / 2,
+                    x + this.shift_x + house_width / 2,
                     size / 2,
-                    y + this.shift_y + height / 2
+                    y + this.shift_y + house_height / 2
                 ) * cellSize;
         }
 
