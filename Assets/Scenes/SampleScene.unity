@@ -318,10 +318,12 @@ MonoBehaviour:
   street_original: {fileID: 100000, guid: 0656a7e5759ccaf40a463b72bbf3a345, type: 3}
   street_edge_original: {fileID: 100000, guid: b687ca93b41e3864e8ccd86645ef1adb, type: 3}
   district_type: Warehouse
+  position: {x: 0, y: 0, z: 0}
   width: 0
   height: 0
   street_width: 0
   districtSquareMeterSize: 40
+  maxEUI: 0
 --- !u!4 &856079033
 Transform:
   m_ObjectHideFlags: 0
@@ -502,6 +504,7 @@ MonoBehaviour:
   buffer_size_minus_y: 0
   camera_distance: 0
   district: {fileID: 856079031}
+  maxEUI: 0
 --- !u!4 &1331657143
 Transform:
   m_ObjectHideFlags: 0

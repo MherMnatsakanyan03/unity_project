@@ -11,7 +11,7 @@ namespace CityRender
         public int energy_star = 50;
         public int colling_degree_days = 50;
         public int warming_degree_days = 50;
-        public float relativ_eui = 5000;
+        public double relativ_eui = 5000;
         public int relativ_year_build = 2000;
 
         public string house_type;
