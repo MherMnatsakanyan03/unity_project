@@ -1,14 +1,12 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using CityData;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 using City = CityRender.City;
-using CSVReader = CityData.CSVReader;
+using District = CityRender.District;
 using EventListener = CityRender.EventListener;
-using House = CityRender.House;
-using Year = CityData.Year;
+using House_data = CityRender.House_data;
 
 public class UI : MonoBehaviour
 {
@@ -41,12 +39,7 @@ public class UI : MonoBehaviour
 
     private List<List<GameObject>> citiesObject = new();
 
-    // Placeholder Cubes, shoukd be replaced with actual city data
-    private GameObject[] cubes;
-
-    private EventListener el;
-
-    void OnEnable()
+    void Start()
     {
         LoadData();
         GetUIComponents();
@@ -55,68 +48,145 @@ public class UI : MonoBehaviour
 
         // Initialize
         SetYearDisplay(currentYearIndex);
-        cubes = GameObject.FindGameObjectsWithTag("Cube");
-        System.Array.Sort(
-            cubes,
-            (a, b) => a.transform.position.x.CompareTo(b.transform.position.x)
-        );
-        FocusCameraOnCity(currentCityIndex);
-    }
-
-    void Start()
-    {
         CreateCitys();
+        FocusCameraOnCity();
+
+        // Set all cities to inactive except the current Year
+        for (int i = 1; i < citiesObject.Count; i++)
+        {
+            citiesObject[i].ForEach(city => city.SetActive(false));
+        }
+
+        // Log all cities
+        string log = "";
+
+        for (int i = 0; i < citiesObject.Count; i++)
+        {
+            log += "Year " + (i + YEAR_OFFSET) + ":\n";
+            for (int j = 0; j < citiesObject[i].Count; j++)
+            {
+                log += "\tCity " + j + ": " + citiesObject[i][j].GetComponent<City>().city_data.city_id + "\n";
+                // Log coordinates
+                log += "\t\tCoordinates: " + citiesObject[i][j].transform.position + "\n";
+            }
+        }
+
+        Debug.Log(log);
+
     }
 
     /* ================================================ Private Functions =============================================== */
 
     private void CreateCitys()
     {
-        int i = 0,
-            j = 0;
+        int i = 0;
+        Vector2 init_pos = new Vector2(0, 0);
         foreach (Year year in years)
         {
-            if (i != 0)
-            {
-                break;
-            }
-            i++;
+            int j = 0;
             citiesObject.Add(new List<GameObject>());
 
             foreach (CityObj city_obj in year.GetCities())
             {
-                if (j != 0)
+                try
                 {
-                    break;
+                    GameObject new_city = Instantiate(initCity);
+                    City script = new_city.GetComponent<City>();
+                    script.city_data = city_obj;
+                    script.create_city();
+
+                    new_city.transform.position = new Vector3(init_pos.x, 0, init_pos.y);
+
+                    var currentCity = new_city.GetComponent<City>();
+                    var city_width = (currentCity.size_x + currentCity.size_minus_x) * 3;
+                    var city_height = (currentCity.size_y + currentCity.size_minus_y) * 3;
+
+                    init_pos.x += Math.Max(city_height, city_width) + 100;
+
+                    citiesObject[i].Add(new_city);
+
+                    if (j > 0)
+                    {
+                        var prevCity = citiesObject[i][j - 1].GetComponent<City>();
+                        var prevCity_width = (prevCity.size_x + prevCity.size_minus_x) * 3;
+                        var prevCity_height = (prevCity.size_y + prevCity.size_minus_y) * 3;
+                        init_pos.x += Math.Max(prevCity_height, prevCity_width) + 100;
+                    }
                 }
-                j++;
-                GameObject new_city = Instantiate(initCity);
-                City script = new_city.GetComponent<City>();
-                Debug.Log(city_obj.city_id);
-                script.city_data = city_obj;
-                script.create_city();
-                citiesObject[^1].Add(new_city);
+                catch (Exception)
+                {
+                    //
+                }
+                finally
+                {
+                    j++;
+                }
             }
+
+            init_pos.x = 0;
+            init_pos.y += 1000;
+            i++;
         }
-        EventListener.current.execute_disableBoxColliderDistrict();
-        EventListener.current.execute_enableBoxColliderHouse();
-        Camera.main.transform.position = new Vector3(
-            0,
-            50,
-            -citiesObject[0][0].GetComponent<City>().camera_distance - 50
-        );
+        SetModeCity();
     }
+
+    private GameObject currentDistrict = null;
 
     private void Update()
     {
         if (Input.GetMouseButtonDown(0)) // �berpr�fen, ob die linke Maustaste gedr�ckt wurde
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // Erzeugen eines Strahls von der Mausposition
-            RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit)) // �berpr�fen, ob der Strahl ein GameObject getroffen hat
+            if (Physics.Raycast(ray, out RaycastHit hit)) // �berpr�fen, ob der Strahl ein GameObject getroffen hat
             {
-                //hit.collider.gameObject.transform
+                // View of City
+                if (currentMode == 0)
+                {
+                    SetModeDistrict();
+
+                    FocusCameraOnDistrict(hit.collider.gameObject);
+                    Debug.Log(
+                        "Current District: "
+                            + hit.collider.gameObject.GetComponent<District>().district_type
+                    );
+                    currentDistrict = hit.collider.gameObject;
+                }
+                // View of District
+                else if (currentMode == 1)
+                {
+                    SetModeHouse();
+
+                    FocusCameraOnObject(hit.collider.gameObject);
+                    Debug.Log(
+                        "Current House: "
+                            + hit.collider.gameObject.GetComponent<House_data>().house_type
+                    );
+                }
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            // View of District
+            if (currentMode == 1)
+            {
+                SetModeCity();
+
+                FocusCameraOnCity();
+            }
+            // View of House
+            else if (currentMode == 2)
+            {
+                SetModeDistrict();
+
+                if (currentDistrict != null)
+                {
+                    Debug.Log(
+                        "Current District: "
+                            + currentDistrict.GetComponent<District>().district_type
+                    );
+                    FocusCameraOnDistrict(currentDistrict);
+                }
             }
         }
     }
@@ -126,10 +196,29 @@ public class UI : MonoBehaviour
      */
     private void NextYear()
     {
-        if (currentYearIndex < years.Count - 1)
+        if (currentYearIndex < citiesObject.Count - 1)
         {
+            Debug.Log("Year: " + currentYearIndex + ",\tCity: " + currentCityIndex);
+            var oldCity = citiesObject[currentYearIndex][currentCityIndex];
+
+            citiesObject[currentYearIndex].ForEach(city => city.SetActive(false));
             currentYearIndex++;
-            years[currentYearIndex].PrintYear();
+            citiesObject[currentYearIndex].ForEach(city => city.SetActive(true));
+
+            currentCityIndex = citiesObject[currentYearIndex]
+                .FindIndex(city =>
+                    city.GetComponent<City>().city_data.city_id
+                    == oldCity.GetComponent<City>().city_data.city_id
+                );
+
+            if (currentCityIndex == -1)
+            {
+                currentCityIndex = 0;
+            }
+
+            SetModeCity();
+            SetYearDisplay(currentYearIndex);
+            FocusCameraOnCity();
         }
     }
 
@@ -140,8 +229,27 @@ public class UI : MonoBehaviour
     {
         if (currentYearIndex > 0)
         {
+            Debug.Log("Year: " + currentYearIndex + ",\tCity: " + currentCityIndex);
+
+            var oldCity = citiesObject[currentYearIndex][currentCityIndex];
+
+            citiesObject[currentYearIndex].ForEach(city => city.SetActive(false));
             currentYearIndex--;
-            years[currentYearIndex].PrintYear();
+            citiesObject[currentYearIndex].ForEach(city => city.SetActive(true));
+
+            currentCityIndex = citiesObject[currentYearIndex]
+                .FindIndex(city =>
+                    city.GetComponent<City>().city_data.city_id
+                    == oldCity.GetComponent<City>().city_data.city_id
+                );
+
+            if (currentCityIndex == -1)
+            {
+                currentCityIndex = 0;
+            }
+            SetModeCity();
+            SetYearDisplay(currentYearIndex);
+            FocusCameraOnCity();
         }
     }
 
@@ -159,10 +267,10 @@ public class UI : MonoBehaviour
      */
     private void NextCity()
     {
-        if (currentCityIndex < cubes.Length - 1)
+        if (currentCityIndex < citiesObject[currentYearIndex].Count - 1)
         {
             currentCityIndex++;
-            FocusCameraOnCity(currentCityIndex);
+            FocusCameraOnCity();
         }
     }
 
@@ -174,7 +282,7 @@ public class UI : MonoBehaviour
         if (currentCityIndex > 0)
         {
             currentCityIndex--;
-            FocusCameraOnCity(currentCityIndex);
+            FocusCameraOnCity();
         }
     }
 
@@ -182,12 +290,74 @@ public class UI : MonoBehaviour
      * Focus the camera on the city at the given index
      * @param cityIndex The index of the city to focus on
      */
-    private void FocusCameraOnCity(int cityIndex)
+    private void FocusCameraOnCity()
     {
+        var currentGameObject = citiesObject[currentYearIndex][currentCityIndex];
+        var currentCity = currentGameObject.GetComponent<City>();
+        var alpha = Camera.main.fieldOfView / 2;
+        var city_width = currentCity.size_x + currentCity.size_minus_x;
+        var city_height = currentCity.size_y + currentCity.size_minus_y;
+        var a = Math.Max(city_width, city_height) / 2;
+        var distance = a / Mathf.Tan(alpha * Mathf.Deg2Rad);
+
         Camera.main.transform.position = new Vector3(
-            cubes[cityIndex].transform.position.x,
-            cubes[cityIndex].transform.position.y,
-            -10
+            currentGameObject.transform.position.x,
+            distance,
+            currentGameObject.transform.position.z
+        );
+    }
+
+    private void FocusCameraOnDistrict(GameObject district)
+    {
+        // Get the collider attached to the object
+        if (!district.TryGetComponent<Collider>(out var collider))
+        {
+            Debug.LogError("No collider found on the object!");
+            return;
+        }
+
+        // Calculate the dimensions of the collider
+        var districtData = district.GetComponent<District>();
+        float width = districtData.width;
+        float height = districtData.height;
+
+        // Calculate the distance from the object for camera positioning
+        var alpha = Camera.main.fieldOfView / 2;
+        var a = Mathf.Max(width, height) / 2;
+        var distance = a / Mathf.Tan(alpha * Mathf.Deg2Rad);
+
+        // Set the camera position directly above the object
+        Camera.main.transform.position = new Vector3(
+            district.transform.position.x,
+            distance + 20,
+            district.transform.position.z // Assuming 2D (X-Z plane)
+        );
+    }
+
+    private void FocusCameraOnObject(GameObject obj)
+    {
+        // Get the collider attached to the object
+        if (!obj.TryGetComponent<Collider>(out var collider))
+        {
+            Debug.LogError("No collider found on the object!");
+            return;
+        }
+
+        // Calculate the dimensions of the collider
+        Vector3 colliderSize = collider.bounds.size;
+        float width = colliderSize.x;
+        float height = colliderSize.z;
+
+        // Calculate the distance from the object for camera positioning
+        var alpha = Camera.main.fieldOfView / 2;
+        var a = Mathf.Max(width, height) / 2;
+        var distance = a / Mathf.Tan(alpha * Mathf.Deg2Rad);
+
+        // Set the camera position directly above the object
+        Camera.main.transform.position = new Vector3(
+            obj.transform.position.x,
+            distance + 20,
+            obj.transform.position.z // Assuming 2D (X-Z plane)
         );
     }
 
@@ -252,17 +422,28 @@ public class UI : MonoBehaviour
         blueBtn.clicked += show_eui;
     }
 
-    /**
-     * Set the color of the text in the cube-object
-     * @param color The color-object to set the text to
-     */
-    private void SetCubeTextColor(Color color)
+    private void SetModeCity()
     {
-        foreach (var cube in cubes)
-        {
-            // Set Text Mesh Pro color
-            cube.GetComponent<TMPro.TextMeshPro>().color = color;
-        }
+        EventListener.current.execute_enableBoxColliderDistrict();
+        EventListener.current.execute_disableBoxColliderHouse();
+
+        currentMode = 0;
+    }
+
+    private void SetModeDistrict()
+    {
+        EventListener.current.execute_disableBoxColliderDistrict();
+        EventListener.current.execute_enableBoxColliderHouse();
+
+        currentMode = 1;
+    }
+
+    private void SetModeHouse()
+    {
+        EventListener.current.execute_disableBoxColliderDistrict();
+        EventListener.current.execute_disableBoxColliderHouse();
+
+        currentMode = 2;
     }
 
     private void show_energy_star()
