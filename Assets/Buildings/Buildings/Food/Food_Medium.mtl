@@ -1,0 +1,28 @@
+newmtl dunkelgruen
+Kd 0.03559985 0.3018867 0.06566445
+d 1
+
+newmtl Gruen
+Kd 0.09852257 0.509434 0.1766677
+d 1
+
+newmtl Grey
+Kd 0.6268342 0.6440219 0.6666666
+d 1
+
+newmtl Schwarz
+Kd 0 0 0
+d 1
+
+newmtl Himmelblau
+Kd 0.6352941 0.9019608 1
+d 1
+
+newmtl Dunkelgrau
+Kd 0.3136742 0.3172009 0.3270439
+d 1
+
+newmtl Rot
+Kd 0.5283019 0.1270914 0.1270914
+d 1
+
