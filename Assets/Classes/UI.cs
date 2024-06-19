@@ -88,8 +88,6 @@ public class UI : MonoBehaviour
 
             foreach (CityObj city_obj in year.GetCities())
             {
-                try
-                {
                     GameObject new_city = Instantiate(initCity);
                     City script = new_city.GetComponent<City>();
                     script.city_data = city_obj;
@@ -112,15 +110,7 @@ public class UI : MonoBehaviour
                         var prevCity_height = (prevCity.size_y + prevCity.size_minus_y) * 3;
                         init_pos.x += Math.Max(prevCity_height, prevCity_width) + 100;
                     }
-                }
-                catch (Exception)
-                {
-                    //
-                }
-                finally
-                {
-                    j++;
-                }
+                j++;
             }
 
             init_pos.x = 0;

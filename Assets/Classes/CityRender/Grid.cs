@@ -75,7 +75,11 @@ namespace CityRender
                 rectangles[i].Width = (uint)choose_house_dimension_width(i);
                 rectangles[i].Height = (uint)choose_house_dimension_height(i);
                 rectangles[i].Id = i;
+
+                Debug.Log(this.houses_area[0] + " " + this.houses_area[1] + " " + this.houses_area[2]);
+                Debug.Log("w: " + rectangles[i].Width + " h: " + rectangles[i].Height);
             }
+            
 
             RectanglePacker.Pack(rectangles, out PackingRectangle bounds);
             house_x = new List<float>(rectangles.Length);
@@ -83,18 +87,6 @@ namespace CityRender
 
             for (int i = 0; i < rectangles.Length; i++)
             {
-                Debug.Log(
-                    "x: "
-                        + rectangles[i].X
-                        + " y: "
-                        + rectangles[i].Y
-                        + " Height: "
-                        + rectangles[i].Height
-                        + " Width: "
-                        + rectangles[i].Width
-                        + " id: "
-                        + rectangles[i].Id
-                );
                 house_x.Add(rectangles[i].X);
                 house_y.Add(rectangles[i].Y);
             }
@@ -148,19 +140,6 @@ namespace CityRender
             }
         }
 
-        /*
-        public void update_grid(int width, int height, int shift_x, int shift_y)
-        {
-            this.width = width;
-            this.height = height;
-            this.shift_x = shift_x;
-            this.shift_y = shift_y;
-            this.gridArray = new int[width, height];
-            fill_array(this.gridArray);
-            place_houses();
-        }
-        */
-
         public void place_houses(List<float> house_x, List<float> house_y)
         {
             for (int i = 0; i < house_x.Count; i++)
@@ -181,18 +160,22 @@ namespace CityRender
 
         private float choose_house_dimension_width(int i)
         {
+            this.counter = 0;
             for (int j = 0; j < 2; j++)
             {
+                
                 if (i >= this.number_houses_cum_sum[this.counter] && this.counter < 2)
                 {
                     this.counter++;
                 }
             }
+            
             return this.house_width[counter];
         }
 
         private float choose_house_dimension_height(int i)
         {
+            this.counter = 0;
             for (int j = 0; j < 2; j++)
             {
                 if (i >= this.number_houses_cum_sum[this.counter] && this.counter < 2)
