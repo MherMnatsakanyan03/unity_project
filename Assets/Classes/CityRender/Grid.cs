@@ -48,7 +48,8 @@ namespace CityRender
             List<int> number_houses,
             string house_type,
             List<CityData.House> houses,
-            double maxEUI
+            double maxEUI,
+            GameObject cube
         )
         {
             this.shift_x = shift_x;
@@ -64,7 +65,7 @@ namespace CityRender
             this.house_types.Add(house_type + "_middle");
             this.house_types.Add(house_type + "_big");
             this.parent = parent;
-            this.cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            this.cube = cube;
             this.cube.SetActive(false);
             this.maxEUI = maxEUI;
 

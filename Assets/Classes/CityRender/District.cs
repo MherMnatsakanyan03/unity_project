@@ -13,6 +13,9 @@ namespace CityRender
         private GameObject street_original,
             street_edge_original;
 
+        [SerializeField]
+        private GameObject house;
+
         private List<GameObject> houses = new List<GameObject>();
         public string district_type = "Warehouse";
 
@@ -49,7 +52,8 @@ namespace CityRender
                     number_houses,
                     district_type,
                     facility_data.GetHouses(),
-                    maxEUI
+                    maxEUI,
+                    house
                 );
 
 
