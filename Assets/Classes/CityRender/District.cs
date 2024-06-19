@@ -23,6 +23,7 @@ namespace CityRender
         public float districtSquareMeterSize = 40f;
 
         public Facility facility_data;
+        public double maxEUI;
 
         public void create_district()
         {
@@ -47,7 +48,8 @@ namespace CityRender
                     houses_area,
                     number_houses,
                     district_type,
-                    facility_data.GetHouses()
+                    facility_data.GetHouses(),
+                    maxEUI
                 );
 
 
