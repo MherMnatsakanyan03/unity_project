@@ -23,6 +23,10 @@ public class UI : MonoBehaviour
 
     private IntegerField yearDisplay;
 
+    private VisualElement colorbar;
+    private Label upper_limit_colorbar;
+    private Label bottom_limit_colorbar;
+
     private CSVReader csvReader;
     private List<Year> years;
 
@@ -212,6 +216,17 @@ public class UI : MonoBehaviour
         greenBtn = root.Q<Button>("btn1");
         yellowBtn = root.Q<Button>("btn2");
         blueBtn = root.Q<Button>("btn3");
+
+        upper_limit_colorbar = root.Q<Label>("UpperLimit");
+        bottom_limit_colorbar = root.Q<Label>("BottomLimit");
+        colorbar = root.Q<VisualElement>("Colorbar");
+    }
+
+    private void diable_colorbar()
+    {
+        upper_limit_colorbar.style.display = DisplayStyle.None;
+        bottom_limit_colorbar.style.display = DisplayStyle.None;
+        colorbar.style.display = DisplayStyle.None;
     }
 
     /**
