@@ -49,7 +49,8 @@ namespace CityRender
             List<int> number_houses,
             string house_type,
             List<CityData.House> houses,
-            double maxEUI
+            double maxEUI,
+            GameObject cube
         )
         {
             this.shift_x = shift_x;
@@ -65,7 +66,7 @@ namespace CityRender
             this.house_types.Add(house_type + "_middle");
             this.house_types.Add(house_type + "_big");
             this.parent = parent;
-            this.cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            this.cube = cube;
             this.cube.SetActive(false);
             this.maxEUI = maxEUI;
 
@@ -73,8 +74,8 @@ namespace CityRender
             PackingRectangle[] rectangles = new PackingRectangle[this.number_houses_cum_sum[2]];
             for (int i = 0; i < rectangles.Length; i++)
             {
-                rectangles[i].Width = (uint)choose_house_dimension_width(i)+2;
-                rectangles[i].Height = (uint)choose_house_dimension_height(i)+2;
+                rectangles[i].Width = (uint)choose_house_dimension_width(i);
+                rectangles[i].Height = (uint)choose_house_dimension_height(i);
                 rectangles[i].Id = i;
             }
             
@@ -198,7 +199,7 @@ namespace CityRender
             }
 
             var x = (int)Math.Sqrt((double)this.houses_area[counter]);
-            this.cube.transform.localScale = new Vector3(x, x, x);
+            this.cube.transform.localScale = new Vector3(x*0.02f, x * 0.02f, x * 0.02f);
             house_type = house_types[counter];
             return this.cube;
         }
