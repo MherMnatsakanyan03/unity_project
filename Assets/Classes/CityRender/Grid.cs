@@ -38,6 +38,7 @@ namespace CityRender
         public int spacing = 2;
 
         private List<CityData.House> houses;
+        private double maxEUI;
 
         public Grid(
             Transform parent,
@@ -47,7 +48,8 @@ namespace CityRender
             List<int> houses_area,
             List<int> number_houses,
             string house_type,
-            List<CityData.House> houses
+            List<CityData.House> houses,
+            double maxEUI
         )
         {
             this.shift_x = shift_x;
@@ -65,6 +67,7 @@ namespace CityRender
             this.parent = parent;
             this.cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
             this.cube.SetActive(false);
+            this.maxEUI = maxEUI;
 
             calculate_house_dimensions();
             PackingRectangle[] rectangles = new PackingRectangle[this.number_houses_cum_sum[2]];
@@ -144,7 +147,8 @@ namespace CityRender
                 House house = new House(
                     GetWorldPosition((int)house_x[i], (int)house_y[i]),
                     this.house_copy,
-                    this.houses[i]
+                    this.houses[i],
+                    this.maxEUI
                 );
                 house.house_type = house_type;
                 GameObject t = house.create_house();

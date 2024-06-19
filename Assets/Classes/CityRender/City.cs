@@ -29,9 +29,14 @@ namespace CityRender
 
         private List<GameObject> copiedObject = new List<GameObject>();
 
+        public double maxEUI;
+
         public void create_city()
         {
             building_class = city_data.GetBuildingClasses()[0];
+
+            maxEUI = city_data.GetMaxEUI();
+
             List<string> district_names = building_class.GetFacilitiesNames();
             System.Random random = new System.Random();
 
@@ -41,6 +46,7 @@ namespace CityRender
                 District script = new_district.GetComponent<District>();
                 script.facility_data = building_class.GetFacilities()[i];
                 script.district_type = district_names[i];
+                script.maxEUI = maxEUI;
                 new_district.transform.SetParent(transform);
                 copiedObject.Add(new_district);
             }
