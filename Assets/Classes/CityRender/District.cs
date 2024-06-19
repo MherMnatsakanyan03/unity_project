@@ -25,7 +25,8 @@ namespace CityRender
 
         public void create_district()
         {
-            districtSquareMeterSize = facility_data.GetTotalArea() / 100000;
+            districtSquareMeterSize = (int)facility_data.GetTotalArea() / 100000;
+            Debug.Log("districtSquareMeterSize: "+ (int)districtSquareMeterSize);
             float randomNumber = 0.5f;
             var b = (int)Mathf.Sqrt(districtSquareMeterSize / randomNumber) * 10;
             var a = (int)(randomNumber * b);
@@ -34,60 +35,64 @@ namespace CityRender
             this.width = a + street_width;
             this.height = b + street_width;
 
-            //Create Streets
-            (List<Matrix4x4> streetMatricesN, List<Matrix4x4> edgeMatricesN) =
-                StreetPositionCalculator.createStreet_Matrix4x4(
-                    gameObject,
-                    street_original,
-                    street_edge_original,
-                    a,
-                    b
-                );
-            for (int i = 0; i < streetMatricesN.Count; i++)
+            if(districtSquareMeterSize != 0)
             {
-                Matrix4x4 matrix = streetMatricesN[i];
-                GameObject street = Instantiate(street_original);
-                street.transform.SetParent(gameObject.transform);
-                StreetPositionCalculator.SetTransformFromMatrix(street.transform, ref matrix);
-            }
-            for (int i = 0; i < edgeMatricesN.Count; i++)
-            {
-                Matrix4x4 matrix = edgeMatricesN[i];
-                GameObject street = Instantiate(street_edge_original);
-                street.transform.SetParent(gameObject.transform);
-                StreetPositionCalculator.SetTransformFromMatrix(street.transform, ref matrix);
-            }
+                //Create Streets
+                (List<Matrix4x4> streetMatricesN, List<Matrix4x4> edgeMatricesN) =
+                    StreetPositionCalculator.createStreet_Matrix4x4(
+                        gameObject,
+                        street_original,
+                        street_edge_original,
+                        a,
+                        b
+                    );
+                for (int i = 0; i < streetMatricesN.Count; i++)
+                {
+                    Matrix4x4 matrix = streetMatricesN[i];
+                    GameObject street = Instantiate(street_original);
+                    street.transform.SetParent(gameObject.transform);
+                    StreetPositionCalculator.SetTransformFromMatrix(street.transform, ref matrix);
+                }
+                for (int i = 0; i < edgeMatricesN.Count; i++)
+                {
+                    Matrix4x4 matrix = edgeMatricesN[i];
+                    GameObject street = Instantiate(street_edge_original);
+                    street.transform.SetParent(gameObject.transform);
+                    StreetPositionCalculator.SetTransformFromMatrix(street.transform, ref matrix);
+                }
 
-            //Create Houses
-            //get_house_modells(district_type);
-            List<int> houses_area = new List<int>
-            {
+                //Create Houses
+                //get_house_modells(district_type);
+                List<int> houses_area = new List<int>
+                {
                 (int)facility_data.GetThreshoulds(0) / 100000,
                 (int)facility_data.GetThreshoulds(1) / 100000,
                 (int)facility_data.GetThreshoulds(2) / 100000
-            };
-            List<int> number_houses = new List<int>
-            {
+                };
+                List<int> number_houses = new List<int>
+                {
                 (int)facility_data.GetCountPart(0),
                 (int)facility_data.GetCountPart(1),
                 (int)facility_data.GetCountPart(2)
-            };
-            Grid grid = new Grid(
-                gameObject.transform,
-                (int)(b),
-                (int)(a),
-                1,
-                -(int)(a),
-                0,
-                houses_area,
-                number_houses,
-                district_type,
-                facility_data.GetHouses()
-            );
-            //grid.drawOutlines();
+                };
+                Grid grid = new Grid(
+                    gameObject.transform,
+                    (int)(b),
+                    (int)(a),
+                    1,
+                    -(int)(a),
+                    0,
+                    houses_area,
+                    number_houses,
+                    district_type,
+                    facility_data.GetHouses()
+                );
+                //grid.drawOutlines();
 
-            EventListener.current.enableBoxColliderDistrict += enableBoxCollider;
-            EventListener.current.disableBoxColliderDistrict += disableBoxCollider;
+                EventListener.current.enableBoxColliderDistrict += enableBoxCollider;
+                EventListener.current.disableBoxColliderDistrict += disableBoxCollider;
+            }
+            
         }
 
         private void enableBoxCollider()

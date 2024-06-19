@@ -21,6 +21,10 @@ public class UI : MonoBehaviour
 
     private IntegerField yearDisplay;
 
+    private VisualElement colorbar;
+    private Label upper_limit_colorbar;
+    private Label bottom_limit_colorbar;
+
     private CSVReader csvReader;
     private List<Year> years;
 
@@ -82,8 +86,6 @@ public class UI : MonoBehaviour
 
             foreach (CityObj city_obj in year.GetCities())
             {
-                try
-                {
                     GameObject new_city = Instantiate(initCity);
                     City script = new_city.GetComponent<City>();
                     script.city_data = city_obj;
@@ -111,15 +113,7 @@ public class UI : MonoBehaviour
                         var prevCity_height = (prevCity.size_y + prevCity.size_minus_y) * 3;
                         init_pos.x += Math.Max(prevCity_height, prevCity_width) + 100;
                     }
-                }
-                catch (Exception)
-                {
-                    //
-                }
-                finally
-                {
-                    j++;
-                }
+                j++;
             }
 
             init_pos.x = 0;
@@ -400,6 +394,17 @@ public class UI : MonoBehaviour
         greenBtn = root.Q<Button>("btn1");
         yellowBtn = root.Q<Button>("btn2");
         blueBtn = root.Q<Button>("btn3");
+
+        upper_limit_colorbar = root.Q<Label>("UpperLimit");
+        bottom_limit_colorbar = root.Q<Label>("BottomLimit");
+        colorbar = root.Q<VisualElement>("Colorbar");
+    }
+
+    private void diable_colorbar()
+    {
+        upper_limit_colorbar.style.display = DisplayStyle.None;
+        bottom_limit_colorbar.style.display = DisplayStyle.None;
+        colorbar.style.display = DisplayStyle.None;
     }
 
     /**
