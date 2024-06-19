@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using CityData;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 using City = CityRender.City;
@@ -50,6 +51,8 @@ public class UI : MonoBehaviour
         SetYearDisplay(currentYearIndex);
         CreateCitys();
         FocusCameraOnCity();
+        diable_colorbar();
+
 
         // Set all cities to inactive except the current Year
         for (int i = 1; i < citiesObject.Count; i++)
@@ -76,6 +79,18 @@ public class UI : MonoBehaviour
     }
 
     /* ================================================ Private Functions =============================================== */
+
+    private void CreateTest()
+    {
+                citiesObject.Add(new List<GameObject>());
+                CityObj city_obj = years[0].GetCities()[0];
+                GameObject new_city = Instantiate(initCity);
+                City script = new_city.GetComponent<City>();
+                script.city_data = city_obj;
+                script.create_city();
+                citiesObject[0].Add(new_city);
+    }
+
 
     private void CreateCitys()
     {
@@ -240,6 +255,7 @@ public class UI : MonoBehaviour
             SetModeCity();
             SetYearDisplay(currentYearIndex);
             FocusCameraOnCity();
+            diable_colorbar();
         }
     }
 
@@ -389,6 +405,19 @@ public class UI : MonoBehaviour
         colorbar.style.display = DisplayStyle.None;
     }
 
+    private void enable_colorbar()
+    {
+        upper_limit_colorbar.style.display = DisplayStyle.Flex;
+        bottom_limit_colorbar.style.display = DisplayStyle.Flex;
+        colorbar.style.display = DisplayStyle.Flex;
+    }
+
+    private void change_text(string up_text, string bot_text)
+    {
+        upper_limit_colorbar.text = up_text;
+        bottom_limit_colorbar.text = bot_text;
+    }
+
     /**
      * Initialize Button Click Events
      */
@@ -407,9 +436,9 @@ public class UI : MonoBehaviour
         };
         nextCityButton.clicked += NextCity;
         prevCityButton.clicked += PrevCity;
-        greenBtn.clicked += show_energy_star;
-        yellowBtn.clicked += show_year_build;
-        blueBtn.clicked += show_eui;
+        greenBtn.clicked += () => { show_energy_star(); enable_colorbar(); change_text("100 %", "0"); };
+        yellowBtn.clicked += () => { show_year_build(); enable_colorbar(); };
+        blueBtn.clicked += () => { show_eui(); enable_colorbar(); };
     }
 
     private void SetModeCity()
