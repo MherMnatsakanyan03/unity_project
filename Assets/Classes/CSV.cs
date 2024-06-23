@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace CityData
@@ -28,6 +29,8 @@ namespace CityData
 
         private readonly List<Year> years = new();
 
+        private Dictionary<string, string> facility_color_map = new();
+
         public CSVReader()
         {
             ReadCSV();
@@ -36,11 +39,17 @@ namespace CityData
         public void Start()
         {
             PrintData();
+            PrintColors();
         }
 
         public List<Year> GetData()
         {
             return years;
+        }
+
+        public Dictionary<string, string> GetFacilityColorMap()
+        {
+            return facility_color_map;
         }
 
         /**
@@ -121,9 +130,83 @@ namespace CityData
             Debug.Log(log);
         }
 
+        public void PrintColors()
+        {
+            string log = "";
+            foreach (var color in facility_color_map)
+            {
+                log += color.Key + ": " + color.Value + "\n";
+            }
+            Debug.Log(log);
+        }
+
         /* ==================================================== Functions =================================================== */
 
-        /**
+        private string GenerateColorFromWheel(int index, int total)
+        {
+            double hue = (double)index / total;
+            int r,
+                g,
+                b;
+            HsvToRgb(hue, 1.0, 1.0, out r, out g, out b);
+            return $"#{r:X2}{g:X2}{b:X2}";
+        }
+
+        private void HsvToRgb(double h, double s, double v, out int r, out int g, out int b)
+        {
+            double rD,
+                gD,
+                bD;
+
+            int i = (int)(h * 6);
+            double f = h * 6 - i;
+            double p = v * (1 - s);
+            double q = v * (1 - f * s);
+            double t = v * (1 - (1 - f) * s);
+
+            switch (i % 6)
+            {
+                case 0:
+                    rD = v;
+                    gD = t;
+                    bD = p;
+                    break;
+                case 1:
+                    rD = q;
+                    gD = v;
+                    bD = p;
+                    break;
+                case 2:
+                    rD = p;
+                    gD = v;
+                    bD = t;
+                    break;
+                case 3:
+                    rD = p;
+                    gD = q;
+                    bD = v;
+                    break;
+                case 4:
+                    rD = t;
+                    gD = p;
+                    bD = v;
+                    break;
+                case 5:
+                    rD = v;
+                    gD = p;
+                    bD = q;
+                    break;
+                default:
+                    rD = gD = bD = 0;
+                    break;
+            }
+
+            r = (int)(rD * 255);
+            g = (int)(gD * 255);
+            b = (int)(bD * 255);
+        }
+
+/**
          * Read the CSV file and store the data in the years, cities, building classes, and facilities
          * Includes some pre-processing to calculate things
          */
@@ -349,8 +432,25 @@ namespace CityData
                 {
                     foreach (Building_Class building_class in city.GetBuildingClasses())
                     {
-                        foreach (Facility facility in building_class.GetFacilities())
+                        var facilities = building_class.GetFacilities();
+                        // sort facilities alphabetically
+                        //facilities.Sort((a, b) => a.facility_type.CompareTo(b.facility_type));
+
+                        foreach (Facility facility in facilities)
                         {
+                            // Generate a random color for each facility type
+                            if (!facility_color_map.ContainsKey(facility.facility_type))
+                            {
+                                facility_color_map.Add(
+                                    facility.facility_type,
+                                    GenerateColorFromWheel(
+                                        facility_color_map.Count,
+                                        facilities.Count
+                                    )
+                                );
+                            }
+
+                            // Set the size thresholds for each
                             facility.SetSizeThresholds();
 
                             foreach (House house in facility.GetHouses())
@@ -425,7 +525,7 @@ namespace CityData
         private double ParseDouble(string @double)
         {
             string[] temp_split = @double.Split('.');
-            string parts = temp_split[0] + (temp_split.Length > 1 ?  "," + temp_split[1] : "");
+            string parts = temp_split[0] + (temp_split.Length > 1 ? "," + temp_split[1] : "");
             return Math.Round(double.Parse(parts), 2);
         }
 
