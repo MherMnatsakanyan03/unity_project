@@ -85,27 +85,70 @@ namespace CityRender
 
         public void show_energy_star()
         {
-            Debug.Log("clicked 2");
-            this.house.GetComponent<Renderer>()
-                .material.SetColor("_Color", this.gradient.Evaluate(this.energy_star / 100f));
+            if (this.house.activeSelf == true) {
+                if (this.energy_star == -1)
+                {
+                    this.house.GetComponent<Renderer>()
+                    .material.SetColor("_Color", new Color(0.5f, 0.5f, 0.5f, 1.0f));
+                }
+                else
+                {
+                    this.house.GetComponent<Renderer>()
+                    .material.SetColor("_Color", this.gradient.Evaluate(this.energy_star / 100f));
+                }
+            }
+            
+            
         }
 
         public void show_year_build()
         {
-            this.house.GetComponent<Renderer>()
-                .material.SetColor(
-                    "_Color",
-                    this.gradient.Evaluate(this.year_build / (float)this.relativ_year_build)
-                );
+            if (this.house.activeSelf == true)
+            {
+                if (this.year_build == -1)
+                {
+                    this.house.GetComponent<Renderer>()
+                    .material.SetColor(
+                        "_Color",
+                        new Color(0.5f, 0.5f, 0.5f, 1.0f)
+                    );
+                }
+                else
+                {
+                    this.house.GetComponent<Renderer>()
+                    .material.SetColor(
+                        "_Color",
+                        this.gradient.Evaluate(this.year_build / (float)this.relativ_year_build)
+                    );
+                }
+            }
+            
+            
         }
 
         public void show_eui()
         {
-            this.house.GetComponent<Renderer>()
-                .material.SetColor(
-                    "_Color",
-                    this.gradient.Evaluate(this.eui / (float)this.relativ_eui)
-                );
+            if (this.house.activeSelf == true)
+            {
+                if (this.eui == -1)
+                {
+                    this.house.GetComponent<Renderer>()
+                    .material.SetColor(
+                        "_Color",
+                        new Color(0.5f, 0.5f, 0.5f, 1.0f)
+                    );
+                }
+                else
+                {
+                    this.house.GetComponent<Renderer>()
+                    .material.SetColor(
+                        "_Color",
+                        this.gradient.Evaluate(this.eui / (float)this.relativ_eui)
+                    );
+                }
+            }
+            
+            
         }
     }
 }

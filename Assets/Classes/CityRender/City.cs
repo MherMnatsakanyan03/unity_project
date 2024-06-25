@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq.Expressions;
 using CityData;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace CityRender
@@ -30,6 +31,7 @@ namespace CityRender
         private List<GameObject> copiedObject = new List<GameObject>();
 
         public double maxEUI;
+        
 
         public void create_city()
         {
@@ -56,16 +58,10 @@ namespace CityRender
         private void arange_city()
         {
             float new_postion_x = 0;
-            float new_postion_y = 0;
             float shift_x = 0;
-            float shift_y = 0;
-            float rotate_x = 0;
-            float rotate_y = 0;
             float rotation = 0;
-            District parten_district_script = null;
-            GameObject parten_district = null;
-            List<District> parent_district_scripts = new List<District>();
-            List<GameObject> parent_districts = new List<GameObject>();
+            float sum_height = 0;
+
             int i = 0;
             foreach (GameObject district in copiedObject)
             {
@@ -86,168 +82,87 @@ namespace CityRender
 
                 var width = -script.width/2 + district.GetComponent<BoxCollider>().center.z;
                 var height = -script.height / 2;
-
-                if (i == 0)
-                {
-                    parten_district_script = script;
-                    parten_district = district;
-                }
-
+                
                 switch (i)
                 {
                     case 0:
                         script.position = district.transform.position + new Vector3(0,0,district.GetComponent<BoxCollider>().center.z);
                         break;
                     case 1:
-                        rotation = 0;
-                        new_postion_x = -parten_district_script.height/2 ;
-                        new_postion_y = parten_district_script.width / 2 + parten_district.GetComponent<BoxCollider>().center.z;
+                        new_postion_x = sum_height;
                         shift_x = new_postion_x - height;
-                        shift_y = new_postion_y - width;
-                        //shift_x = 0;
-                        //shift_y = 0;
-                        district.transform.RotateAround(
-                            new Vector3(rotate_x, 0, rotate_y),
-                            Vector3.up,
-                            rotation
-                        );
-                        district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
-                        parent_district_scripts.Add(script);
-                        parent_districts.Add(district);
-                        buffer_size_x += script.width;
-                        if (script.height > buffer_size_y) { size_y = script.height; }
-                        script.position = district.transform.position + new Vector3(0, 0, district.GetComponent<BoxCollider>().center.z);
+
+                        district.transform.position = new Vector3(0 + shift_x, 0, 0);
+                        size_x += script.height;
+
                         break;
                     case 2:
-                        rotation = 90;
-                        new_postion_x = parten_district_script.height / 2;
-                        new_postion_y = parten_district_script.width / 2 + parten_district.GetComponent<BoxCollider>().center.z;
+                        new_postion_x = sum_height;
                         shift_x = new_postion_x - height;
-                        shift_y = new_postion_y - width;
 
-                        district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
-                        district.transform.RotateAround(
-                            new Vector3(new_postion_x, 0, new_postion_y),
-                            Vector3.up,
-                            rotation
-                        );
-                        parent_district_scripts.Add(script);
-                        parent_districts.Add(district);
-                        buffer_size_y += script.width;
-                        if (script.height > buffer_size_minus_y) { size_minus_y = script.height; }
-                        script.position = district.transform.position + new Vector3(district.GetComponent<BoxCollider>().center.z, 0, 0);
+                        district.transform.position = new Vector3(0 + shift_x, 0, 0);
+                        size_x += script.height;
+
                         break;
                     case 3:
-                        rotation = 180;
-                        new_postion_x = parten_district_script.height / 2;
-                        new_postion_y = -parten_district_script.width / 2 + parten_district.GetComponent<BoxCollider>().center.z;
+                        new_postion_x = sum_height;
                         shift_x = new_postion_x - height;
-                        shift_y = new_postion_y - width;
 
-                        district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
-                        district.transform.RotateAround(
-                            new Vector3(new_postion_x, 0, new_postion_y),
-                            Vector3.up,
-                            rotation
-                        );
-                        parent_district_scripts.Add(script);
-                        parent_districts.Add(district);
-                        camera_distance += script.width;
-                        buffer_size_minus_x += script.width;
-                        if (script.height > buffer_size_minus_y) { size_minus_y = script.height; }
-                        script.position = district.transform.position + new Vector3(0, 0, -district.GetComponent<BoxCollider>().center.z);
+                        district.transform.position = new Vector3(0 + shift_x, 0, 0);
+                        size_x += script.height;
+
                         break;
                     case 4:
-                        rotation = 270;
-                        new_postion_x = -parten_district_script.height / 2;
-                        new_postion_y = -parten_district_script.width / 2 + parten_district.GetComponent<BoxCollider>().center.z;
+                        new_postion_x = sum_height;
                         shift_x = new_postion_x - height;
-                        shift_y = new_postion_y - width;
 
-                        district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
-                        district.transform.RotateAround(
-                            new Vector3(new_postion_x, 0, new_postion_y),
-                            Vector3.up,
-                            rotation
-                        );
-                        parent_district_scripts.Add(script);
-                        parent_districts.Add(district);
-                        buffer_size_minus_y += script.width;
-                        if (script.height > buffer_size_x) { size_x = script.height; }
-                        script.position = district.transform.position + new Vector3(-district.GetComponent<BoxCollider>().center.z, 0, 0);
+                        district.transform.position = new Vector3(0 + shift_x, 0, 0);
+                        size_x += script.height;
+
                         break;
                     case 5:
-                        rotation = 0;
-                        new_postion_x = -parten_district_script.height / 2;
-                        new_postion_y = parent_district_scripts[0].width + parten_district_script.width / 2 + parten_district.GetComponent<BoxCollider>().center.z;
+                        new_postion_x = sum_height;
                         shift_x = new_postion_x - height;
-                        shift_y = new_postion_y - width;
 
-                        district.transform.RotateAround(
-                            new Vector3(rotate_x, 0, rotate_y),
-                            Vector3.up,
-                            rotation
-                        );
-                        district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
-                        buffer_size_x += script.width;
-                        if (script.height > buffer_size_y) { size_y = script.height; }
-                        script.position = district.transform.position + new Vector3(0, 0, district.GetComponent<BoxCollider>().center.z);
+                        district.transform.position = new Vector3(0 + shift_x, 0, 0);
+                        size_x += script.height;
+
                         break;
                     case 6:
-                        rotation = 90;
-                        new_postion_x = parent_district_scripts[1].width + parten_district_script.height / 2;
-                        new_postion_y = parten_district_script.width / 2 + parten_district.GetComponent<BoxCollider>().center.z;
+                        new_postion_x = sum_height;
                         shift_x = new_postion_x - height;
-                        shift_y = new_postion_y - width;
 
-                        district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
-                        district.transform.RotateAround(
-                            new Vector3(new_postion_x, 0, new_postion_y),
-                            Vector3.up,
-                            rotation
-                        );
-                        buffer_size_y += script.width;
-                        if (script.height > buffer_size_minus_y) { size_minus_y = script.height; }
-                        script.position = district.transform.position + new Vector3(district.GetComponent<BoxCollider>().center.z, 0, 0);
+                        district.transform.position = new Vector3(0 + shift_x, 0, 0);
+                        size_x += script.height;
+
                         break;
                     case 7:
-                        rotation = 180;
-                        new_postion_x = parten_district_script.height/2;
-                        new_postion_y = -parent_district_scripts[2].width - parten_district_script.width / 2 + parten_district.GetComponent<BoxCollider>().center.z;
+                        new_postion_x = sum_height;
                         shift_x = new_postion_x - height;
-                        shift_y = new_postion_y - width;
 
-                        district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
-                        district.transform.RotateAround(
-                            new Vector3(new_postion_x, 0, new_postion_y),
-                            Vector3.up,
-                            rotation
-                        );
-                        camera_distance += script.width;
-                        buffer_size_minus_x += script.width;
-                        if (script.height > buffer_size_minus_y) { size_minus_y = script.height; }
-                        script.position = district.transform.position + new Vector3(0, 0, -district.GetComponent<BoxCollider>().center.z);
+                        district.transform.position = new Vector3(0 + shift_x, 0, 0);
+                        size_x += script.height;
+
                         break;
                     case 8:
-                        rotation = 270;
-                        new_postion_x = -parent_district_scripts[3].width - parten_district_script.height / 2;
-                        new_postion_y = -parten_district_script.width / 2 + parten_district.GetComponent<BoxCollider>().center.z;
+                        new_postion_x = sum_height;
                         shift_x = new_postion_x - height;
-                        shift_y = new_postion_y - width;
 
-                        district.transform.position = new Vector3(0 + shift_x, 0, 0 + shift_y);
-                        district.transform.RotateAround(
-                            new Vector3(new_postion_x, 0, new_postion_y),
-                            Vector3.up,
-                            rotation
-                        );
-                        parent_district_scripts.Add(script);
-                        buffer_size_minus_y += script.width;
-                        if (script.height > buffer_size_x) { size_x = script.height; }
-                        script.position = district.transform.position + new Vector3(-district.GetComponent<BoxCollider>().center.z, 0, 0);
+                        district.transform.position = new Vector3(0 + shift_x, 0, 0);
+                        size_x += script.height;
+
                         break;
                     default:
                         break;
+                }
+
+                if (i == 0)
+                {
+                    sum_height += script.height / 2;
+                }
+                else
+                {
+                    sum_height += script.height;
                 }
 
                 i++;
