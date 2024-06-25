@@ -87,7 +87,7 @@ namespace CityRender
                     rectangles[count].X = middle_rectangles[i].Width * (uint)(i - offset);
                     rectangles[count].Y = (uint)y;
                     count++;
-                    if (count % number_of_houses_in_row == 0) { y += (int)middle_rectangles[i].Width; offset += number_of_houses_in_row; }
+                    if ((count- small_rectangles.Length % number_of_houses_in_row) % number_of_houses_in_row == 0) { y += (int)middle_rectangles[i].Width; offset += number_of_houses_in_row; }
                 }
                 if (large_rectangles.Length == 0 && middle_rectangles.Length > 0 && count % number_of_houses_in_row == 0)
                 {
@@ -106,9 +106,9 @@ namespace CityRender
                     rectangles[count].Y = (uint)y;
                     count++;
                     Debug.Log("count: " + count + " number_of_houses_in_row " + number_of_houses_in_row);
-                    if (count % number_of_houses_in_row  == 0) { y += (int)large_rectangles[i].Width; offset += number_of_houses_in_row; }
+                    if ((count-(middle_rectangles.Length+small_rectangles.Length)% number_of_houses_in_row) % number_of_houses_in_row  == 0) { y += (int)large_rectangles[i].Width; offset += number_of_houses_in_row; }
                 }
-                if (large_rectangles.Length > 0 && count % number_of_houses_in_row == 0)
+                if (large_rectangles.Length > 0 && (count- (middle_rectangles.Length + small_rectangles.Length) % number_of_houses_in_row) % number_of_houses_in_row == 0)
                 {
                     y -= (int)large_rectangles[0].Width;
                 }

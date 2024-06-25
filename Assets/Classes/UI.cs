@@ -53,8 +53,8 @@ public class UI : MonoBehaviour
 
         // Initialize
         SetYearDisplay(currentYearIndex);
-        CreateTest();
-        //CreateCitys();
+        //CreateTest();
+        CreateCitys();
         FocusCameraOnCity();
         diable_colorbar();
 
