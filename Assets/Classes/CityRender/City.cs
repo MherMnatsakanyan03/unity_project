@@ -42,7 +42,7 @@ namespace CityRender
             List<string> district_names = building_class.GetFacilitiesNames();
             System.Random random = new System.Random();
 
-            for (int i = 0; i < district_names.Count; i++)
+            for (int i = 0; i < 4; i++)
             {
                 GameObject new_district = Instantiate(district);
                 District script = new_district.GetComponent<District>();
@@ -67,7 +67,6 @@ namespace CityRender
             {
                 District script = district.GetComponent<District>();
 
-                script.districtSquareMeterSize = 50 + i * 10;
                 script.create_district();
                 district.GetComponent<BoxCollider>().size = new Vector3(
                     script.height,

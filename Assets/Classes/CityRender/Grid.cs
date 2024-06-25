@@ -70,27 +70,49 @@ namespace CityRender
             this.maxEUI = maxEUI;
 
             calculate_house_dimensions();
-            PackingRectangle[] rectangles = new PackingRectangle[this.number_houses_cum_sum[2]];
-            for (int i = 0; i < rectangles.Length; i++)
+            PackingRectangle[] small_rectangles = new PackingRectangle[this.number_houses[0]];
+            PackingRectangle[] middle_rectangles = new PackingRectangle[this.number_houses[1]];
+            PackingRectangle[] large_rectangles = new PackingRectangle[this.number_houses[2]];
+            Debug.Log(this.number_houses[0] + " " + this.number_houses[1] + " " + this.number_houses[2]);
+            int id = 0;
+            for (int i = 0; i < small_rectangles.Length; i++)
             {
-                rectangles[i].Width = (uint)choose_house_dimension_width(i)+2;
-                rectangles[i].Height = (uint)choose_house_dimension_height(i)+2;
-                rectangles[i].Id = i;
+                small_rectangles[i].Width = (uint)this.house_width[0] + 2;
+                small_rectangles[i].Height = (uint)this.house_height[0] + 2;
+                small_rectangles[i].Id = id;
+                id++;
             }
-            
 
-            RectanglePacker.Pack(rectangles, out PackingRectangle bounds);
-            house_x = new List<float>(rectangles.Length);
-            house_y = new List<float>(rectangles.Length);
-
-            for (int i = 0; i < rectangles.Length; i++)
+            for (int i = 0; i < middle_rectangles.Length; i++)
             {
-                house_x.Add(rectangles[i].X);
-                house_y.Add(rectangles[i].Y);
+                middle_rectangles[i].Width = (uint)this.house_width[1] + 2;
+                middle_rectangles[i].Height = (uint)this.house_height[1] + 2;
+                middle_rectangles[i].Id = id;
+                id++;
             }
-            this.width = (int)bounds.Width;
-            this.height = (int)bounds.Height;
-            this.shift_x = -this.width / 2;
+
+            for (int i = 0; i < large_rectangles.Length; i++)
+            {
+                large_rectangles[i].Width = (uint)this.house_width[2] + 2;
+                large_rectangles[i].Height = (uint)this.house_height[2] + 2;
+                large_rectangles[i].Id = id;
+                id++;
+            }
+
+            Packing house_positions = new Packing(small_rectangles, middle_rectangles, large_rectangles);
+            house_positions.pack();
+
+            house_x = new List<float>(house_positions.rectangles.Length);
+            house_y = new List<float>(house_positions.rectangles.Length);
+
+            for (int i = 0; i < house_positions.rectangles.Length; i++)
+            {
+                house_x.Add(house_positions.rectangles[i].X);
+                house_y.Add(house_positions.rectangles[i].Y);
+            }
+            this.width = (int)house_positions.bounds.Width;
+            this.height = (int)house_positions.bounds.Height;
+            this.shift_x = -this.height / 2;
             this.area = this.width * this.height;
             place_houses(house_x, house_y);
 
