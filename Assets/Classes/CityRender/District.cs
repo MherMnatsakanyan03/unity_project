@@ -91,7 +91,7 @@ namespace CityRender
                 //get_house_modells(district_type);
 
                 
-                //grid.drawOutlines();
+                grid.drawOutlines();
 
                 EventListener.current.enableBoxColliderDistrict += enableBoxCollider;
                 EventListener.current.disableBoxColliderDistrict += disableBoxCollider;

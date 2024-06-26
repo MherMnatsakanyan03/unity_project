@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using CityData;
 using RectpackSharp;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -27,6 +28,7 @@ namespace CityRender
         private List<float> house_x;
         private List<float> house_y;
         private string house_type;
+        private string district_type;
         private List<string> house_types = new List<string>();
 
         private Transform parent;
@@ -61,6 +63,7 @@ namespace CityRender
             this.number_houses = number_houses; //Anzahl der H�user in den jeweiligen Klassen (klein,mittel,gro�)
             this.number_houses_cum_sum = cum_sum(number_houses);
             this.house_type = house_type;
+            this.district_type = house_type;
             this.house_types.Add(house_type + "_small");
             this.house_types.Add(house_type + "_middle");
             this.house_types.Add(house_type + "_big");
@@ -143,19 +146,60 @@ namespace CityRender
             }
         }
 
+        public Color pick_color()
+        {
+            Debug.Log(this.district_type);
+            switch (this.district_type)
+            {
+                
+                case "Food":
+                    Debug.Log("Food");
+                    return new Color(255, 0, 0);
+                case "Warehouse":
+                    Debug.Log("Warehouse");
+                    return new Color(0, 255, 0);
+                case "Retail":
+                    Debug.Log("Retail");
+                    return new Color(0, 0, 255);
+                case "Education":
+                    Debug.Log("Education");
+                    return new Color(255, 255, 0);
+                case "Office":
+                    Debug.Log("Office");
+                    return new Color(255, 0, 255);
+                case "Commercial":
+                    Debug.Log("Commercial");
+                    return new Color(0, 255, 255);
+                case "Public":
+                    Debug.Log("Public");
+                    return new Color(255, 165, 0);
+                case "Health_Care":
+                    Debug.Log("Health_Care");
+                    return new Color(128f, 0, 128f,10f);
+                case "Peoples":
+                    Debug.Log("Peoples");
+                    return new Color(64, 224, 208);
+                default:
+                    return new Color(0, 0, 0);
+            }
+            
+        }
+
         public void drawOutlines()
         {
+
+
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
-                    if (x == 0 || y == 0)
+                    if (x == 0 || y == 0 || x == width - 1 || y == height - 1)
                     {
                         GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                         cube.transform.parent = parent;
-                        cube.transform.position =
-                            parent.transform.position
-                            + new Vector3(x * cellSize + shift_x, 0, y * cellSize + shift_y);
+                        this.house_copy = cube;
+                        cube.GetComponent<Renderer>().material.color = pick_color();
+                        cube.transform.position = GetWorldPosition(y, x, 1);
                     }
                 }
             }
@@ -235,14 +279,14 @@ namespace CityRender
             }
         }
 
-        private Vector3 GetWorldPosition(int x, int y)
+        private Vector3 GetWorldPosition(int x, int y, int z = 0)
         {
             var house_width = this.house_copy.GetComponent<Renderer>().bounds.size.x;
             var house_height = this.house_copy.GetComponent<Renderer>().bounds.size.y;
             var size = this.house_copy.GetComponent<Renderer>().bounds.size.z;
             return new Vector3(
                     x + this.shift_x + house_width / 2,
-                    size / 2,
+                    size / 2 - z,
                     y + this.shift_y + house_height / 2
                 ) * cellSize;
         }
