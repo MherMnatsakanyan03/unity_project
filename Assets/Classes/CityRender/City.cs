@@ -35,7 +35,7 @@ namespace CityRender
             List<string> district_names = building_class.GetFacilitiesNames();
             System.Random random = new System.Random();
 
-            for (int i = 0; i < district_names.Count; i++)
+            for (int i = 0; i < 3; i++)
             {
                 GameObject new_district = Instantiate(district);
                 District script = new_district.GetComponent<District>();
@@ -74,78 +74,14 @@ namespace CityRender
                 var width = -script.width/2 + district.GetComponent<BoxCollider>().center.z;
                 var height = -script.height / 2;
                 if (script.width > size_y) { size_y = script.width; }
-                switch (i)
-                {
-                    case 0:
-                        script.position = district.transform.position + new Vector3(0,0,district.GetComponent<BoxCollider>().center.z);
-                        break;
-                    case 1:
-                        new_postion_x = sum_height;
-                        shift_x = new_postion_x - height;
 
-                        district.transform.position = new Vector3(0 + shift_x, 0, 0);
-                        size_x += script.height;
+                new_postion_x = sum_height;
+                shift_x = new_postion_x - height;
+                if (i == 0) { shift_x = 0; }
 
-                        break;
-                    case 2:
-                        new_postion_x = sum_height;
-                        shift_x = new_postion_x - height;
-
-                        district.transform.position = new Vector3(0 + shift_x, 0, 0);
-                        size_x += script.height;
-
-                        break;
-                    case 3:
-                        new_postion_x = sum_height;
-                        shift_x = new_postion_x - height;
-
-                        district.transform.position = new Vector3(0 + shift_x, 0, 0);
-                        size_x += script.height;
-
-                        break;
-                    case 4:
-                        new_postion_x = sum_height;
-                        shift_x = new_postion_x - height;
-
-                        district.transform.position = new Vector3(0 + shift_x, 0, 0);
-                        size_x += script.height;
-
-                        break;
-                    case 5:
-                        new_postion_x = sum_height;
-                        shift_x = new_postion_x - height;
-
-                        district.transform.position = new Vector3(0 + shift_x, 0, 0);
-                        size_x += script.height;
-
-                        break;
-                    case 6:
-                        new_postion_x = sum_height;
-                        shift_x = new_postion_x - height;
-
-                        district.transform.position = new Vector3(0 + shift_x, 0, 0);
-                        size_x += script.height;
-
-                        break;
-                    case 7:
-                        new_postion_x = sum_height;
-                        shift_x = new_postion_x - height;
-
-                        district.transform.position = new Vector3(0 + shift_x, 0, 0);
-                        size_x += script.height;
-
-                        break;
-                    case 8:
-                        new_postion_x = sum_height;
-                        shift_x = new_postion_x - height;
-
-                        district.transform.position = new Vector3(0 + shift_x, 0, 0);
-                        size_x += script.height;
-
-                        break;
-                    default:
-                        break;
-                }
+                district.transform.position = new Vector3(0 + shift_x, 0, 0);
+                script.position = district.transform.position;
+                size_x += script.height;
 
                 if (i == 0)
                 {
