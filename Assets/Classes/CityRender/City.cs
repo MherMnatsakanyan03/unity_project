@@ -80,7 +80,7 @@ namespace CityRender
                 if (i == 0) { shift_x = 0; }
 
                 district.transform.position = new Vector3(0 + shift_x, 0, 0);
-                script.position = district.transform.position;
+                script.position = district.transform.position + new Vector3(0, 0, district.GetComponent<BoxCollider>().center.z);
                 size_x += script.height;
 
                 if (i == 0)
