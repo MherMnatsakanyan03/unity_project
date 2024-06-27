@@ -33,7 +33,7 @@ namespace CityRender
         public double maxEUI;
         
 
-        public void create_city()
+        public void create_city(Dictionary<string, string> color_map)
         {
             building_class = city_data.GetBuildingClasses()[0];
 
@@ -52,10 +52,10 @@ namespace CityRender
                 new_district.transform.SetParent(transform);
                 copiedObject.Add(new_district);
             }
-            arange_city();
+            arange_city(color_map);
         }
 
-        private void arange_city()
+        private void arange_city(Dictionary<string, string> color_map)
         {
             float new_postion_x = 0;
             float shift_x = 0;
@@ -67,7 +67,7 @@ namespace CityRender
             {
                 District script = district.GetComponent<District>();
 
-                script.create_district();
+                script.create_district(color_map);
                 district.GetComponent<BoxCollider>().size = new Vector3(
                     script.height,
                     1,
