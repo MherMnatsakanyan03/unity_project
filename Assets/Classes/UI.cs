@@ -477,8 +477,6 @@ public class UI : MonoBehaviour
 
         // Change the angle of the camera
 
-        Camera.main.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
-
         Camera.main.orthographicSize = Math.Max(width, height) / 2;
         Camera.main.transform.position = new Vector3(
             currentCity.position.x + offsets[currentYearIndex][currentCityIndex],
@@ -498,7 +496,6 @@ public class UI : MonoBehaviour
 
         // Revert to top-down view
         Camera.main.orthographic = false;
-        Camera.main.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
         // Calculate the dimensions of the collider
         var districtData = district.GetComponent<District>();
         var middle = districtData.position;
