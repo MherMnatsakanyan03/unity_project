@@ -11,9 +11,9 @@ namespace CityRender
     public class City : MonoBehaviour
     {
 
-        public float size_x = 0f;
-        public float size_y = 0f;
-        public Vector3 postion = Vector3.zero;
+        public float width = 0f;
+        public float height = 0f;
+        public Vector3 position = Vector3.zero;
 
         public float camera_distance = 0;
         public CityObj city_data;
@@ -76,13 +76,13 @@ namespace CityRender
 
                 var width = -script.width/2 + district.GetComponent<BoxCollider>().center.z;
                 var height = -script.height / 2;
-                if (script.width > size_y) { size_y = script.width; }
+                if (script.width > this.height) { this.height = script.width; }
                 if (script.width/2 - script.street_width / 2 > postion_y) { postion_y = script.width/2 -script.street_width / 2; }
 
                 new_postion_x = sum_height;
                 shift_x = new_postion_x - height;
                 if (i == 0) { shift_x = 0; offset = -script.height/2; }
-                size_x += script.height;
+                this.width += script.height;
                 district.transform.position = new Vector3(0 + shift_x, 0, 0);
                 script.position = district.transform.position + new Vector3(0, 0, district.GetComponent<BoxCollider>().center.z);
                 
@@ -98,7 +98,7 @@ namespace CityRender
 
                 i++;
             }
-            postion = new Vector3 (size_x/2+offset, 0, postion_y);
+            position = new Vector3 (width/2+offset, height/2, postion_y);
         }
 
         void Update()

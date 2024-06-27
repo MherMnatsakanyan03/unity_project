@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using CityData;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -55,8 +56,8 @@ public class UI : MonoBehaviour
 
         // Initialize
         SetYearDisplay(currentYearIndex);
-        CreateTest();
-        //CreateCitys();
+        //CreateTest();
+        CreateCitys();
         FocusCameraOnCity();
         disable_colorbar();
 
@@ -121,8 +122,8 @@ public class UI : MonoBehaviour
                 new_city.transform.position = new Vector3(init_pos.x, 0, init_pos.y);
 
                 var currentCity = new_city.GetComponent<City>();
-                var city_width = currentCity.size_y * 3;
-                var city_height = currentCity.size_x * 3;
+                var city_width = currentCity.height * 3;
+                var city_height = currentCity.width * 3;
 
                 init_pos.x += Math.Max(city_height, city_width) + 100;
 
@@ -136,8 +137,8 @@ public class UI : MonoBehaviour
                 if (j > 0)
                 {
                     var prevCity = citiesObject[i][j - 1].GetComponent<City>();
-                    var prevCity_width = prevCity.size_y * 3;
-                    var prevCity_height = prevCity.size_x * 3;
+                    var prevCity_width = prevCity.height * 3;
+                    var prevCity_height = prevCity.width * 3;
                     init_pos.x += Math.Max(prevCity_height, prevCity_width) + 100;
                 }
 
@@ -151,35 +152,40 @@ public class UI : MonoBehaviour
     }
 
     private GameObject currentDistrict = null;
+    private Vector3 old_camera_cosition = Vector3.zero;
+    private float old_camera_size = 0;
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0)) // �berpr�fen, ob die linke Maustaste gedr�ckt wurde
+        if (Input.GetMouseButtonDown(0)) // überprüfen, ob die linke Maustaste gedrückt wurde
         {
             Vector3 mousePosition = Input.mousePosition;
             float screenHeight = Screen.height;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // Erzeugen eines Strahls von der Mausposition
 
             // Falls Objekt getroffen wurde und Mausposition nicht in den oberen 10% oder unteren 10% des Bildschirms
-            if (Physics.Raycast(ray, out RaycastHit hit) && mousePosition.y > 0.1f * screenHeight && mousePosition.y < 0.9f * screenHeight) // �berpr�fen, ob der Strahl ein GameObject getroffen hat
+            if (
+                Physics.Raycast(ray, out RaycastHit hit)
+                && mousePosition.y > 0.1f * screenHeight
+                && mousePosition.y < 0.9f * screenHeight
+            ) // überprüfen, ob der Strahl ein GameObject getroffen hat
             {
                 // View of City
                 if (currentMode == 0)
                 {
-                    SetModeDistrict();
-
+                    old_camera_cosition = Camera.main.transform.position;
+                    old_camera_size = Camera.main.orthographicSize;
                     FocusCameraOnDistrict(hit.collider.gameObject);
                     Debug.Log(
                         "Current District: "
                             + hit.collider.gameObject.GetComponent<District>().district_type
                     );
                     currentDistrict = hit.collider.gameObject;
+                    SetModeDistrict();
                 }
                 // View of District
                 else if (currentMode == 1)
                 {
-                    SetModeHouse();
-
                     FocusCameraOnObject(hit.collider.gameObject);
                     Debug.Log(
                         "Current House: "
@@ -218,6 +224,8 @@ public class UI : MonoBehaviour
                     house_data_list.itemsSource = items;
                     house_data_list.makeItem = makeItem;
                     house_data_list.bindItem = bindItem;
+
+                    SetModeHouse();
                 }
             }
         }
@@ -226,15 +234,14 @@ public class UI : MonoBehaviour
             // View of District
             if (currentMode == 1)
             {
-                SetModeCity();
-
                 FocusCameraOnCity();
+                SetModeCity();
+                Camera.main.transform.position = old_camera_cosition;
+                Camera.main.orthographicSize = old_camera_size;
             }
             // View of House
             else if (currentMode == 2)
             {
-                SetModeDistrict();
-
                 if (currentDistrict != null)
                 {
                     Debug.Log(
@@ -242,6 +249,101 @@ public class UI : MonoBehaviour
                             + currentDistrict.GetComponent<District>().district_type
                     );
                     FocusCameraOnDistrict(currentDistrict);
+                }
+                SetModeDistrict();
+            }
+        }
+        if (currentMode == 0)
+        {
+            if (Input.GetKey(KeyCode.LeftArrow))
+            {
+                var current_city = citiesObject[currentYearIndex]
+                    [currentCityIndex]
+                    .GetComponent<City>();
+                var current_city_pos =
+                    current_city.position.x + offsets[currentYearIndex][currentCityIndex];
+                var left_bound = current_city_pos - current_city.width / 2;
+
+                var width = current_city.width;
+
+                Camera.main.transform.position = new Vector3(
+                    Mathf.Max(left_bound, Camera.main.transform.position.x - width / 100),
+                    Camera.main.transform.position.y,
+                    Camera.main.transform.position.z
+                );
+            }
+            if (Input.GetKey(KeyCode.RightArrow))
+            {
+                var current_city = citiesObject[currentYearIndex]
+                    [currentCityIndex]
+                    .GetComponent<City>();
+                var current_city_pos =
+                    current_city.position.x + offsets[currentYearIndex][currentCityIndex];
+                var right_bound = current_city_pos + current_city.width / 2;
+
+                var width = current_city.width;
+
+                Camera.main.transform.position = new Vector3(
+                    Mathf.Min(right_bound, Camera.main.transform.position.x + width / 100),
+                    Camera.main.transform.position.y,
+                    Camera.main.transform.position.z
+                );
+            }
+            if (Input.GetKey(KeyCode.UpArrow))
+            {
+                var current_city = citiesObject[currentYearIndex]
+                    [currentCityIndex]
+                    .GetComponent<City>();
+                var current_city_pos = current_city.position.y + currentYearIndex * 1000;
+                var upper_bound = current_city_pos + current_city.height / 2;
+
+                var height = current_city.height;
+
+                Camera.main.transform.position = new Vector3(
+                    Camera.main.transform.position.x,
+                    Camera.main.transform.position.y,
+                    Mathf.Min(upper_bound, Camera.main.transform.position.z + height / 100)
+                );
+            }
+            if (Input.GetKey(KeyCode.DownArrow))
+            {
+                var current_city = citiesObject[currentYearIndex]
+                    [currentCityIndex]
+                    .GetComponent<City>();
+                var current_city_pos = current_city.position.y + currentYearIndex * 1000;
+                var lower_bound = current_city_pos - current_city.height / 2;
+
+                var height = current_city.height;
+
+                Camera.main.transform.position = new Vector3(
+                    Camera.main.transform.position.x,
+                    Camera.main.transform.position.y,
+                    Mathf.Max(lower_bound, Camera.main.transform.position.z - height / 100)
+                );
+            }
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                var current_city = citiesObject[currentYearIndex]
+                    [currentCityIndex]
+                    .GetComponent<City>();
+
+                var current_size = Camera.main.orthographicSize;
+
+                if(Camera.main.orthographicSize <= Math.Max(current_city.width, current_city.height))
+                {
+                    Camera.main.orthographicSize += current_size / 100;
+                }
+            }
+            if (Input.GetKey(KeyCode.LeftControl))
+            {
+                var current_city = citiesObject[currentYearIndex]
+                    [currentCityIndex]
+                    .GetComponent<City>();
+
+                var current_size = Camera.main.orthographicSize;
+                
+                if(Camera.main.orthographicSize >= 10) {
+                    Camera.main.orthographicSize -= current_size / 100;
                 }
             }
         }
@@ -354,22 +456,34 @@ public class UI : MonoBehaviour
     {
         var currentGameObject = citiesObject[currentYearIndex][currentCityIndex];
         var currentCity = currentGameObject.GetComponent<City>();
-        var alpha = Camera.main.fieldOfView / 2;
-        var a = Math.Max(currentCity.size_y, currentCity.size_x) / 2;
+
+        // If camera is Perspective
+        /* var alpha = Camera.main.fieldOfView / 2;
+        var a = Math.Max(currentCity.width, currentCity.height) / 2;
         var distance = 0.8f * a / Mathf.Tan(alpha * Mathf.Deg2Rad);
 
         Camera.main.transform.position = new Vector3(
-            currentGameObject.transform.position.x + currentCity.size_x / 2,
+            currentCity.postion.x + offsets[currentYearIndex][currentCityIndex],
             distance,
-            currentGameObject.transform.position.z + currentCity.size_y / 2
-        );
-        Debug.Log(
-            "New Pos: "
-                + currentGameObject.transform.position.x
-                + ", "
-                + currentGameObject.transform.position.z
-                + ", Distance: "
-                + distance
+            currentCity.postion.y + currentYearIndex * 1000 + currentCity.height / 2
+        ); */
+
+        //If camera is Orthographic
+        // Change the width and height parameters to the aspect ratio of the camera
+        Camera.main.orthographic = true;
+        var aspect = Camera.main.aspect;
+        var width = currentCity.width;
+        var height = currentCity.height;
+
+        // Change the angle of the camera
+
+        Camera.main.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+
+        Camera.main.orthographicSize = Math.Max(width, height) / 2;
+        Camera.main.transform.position = new Vector3(
+            currentCity.position.x + offsets[currentYearIndex][currentCityIndex],
+            100,
+            currentCity.position.y + currentYearIndex * 1000
         );
     }
 
@@ -382,6 +496,9 @@ public class UI : MonoBehaviour
             return;
         }
 
+        // Revert to top-down view
+        Camera.main.orthographic = false;
+        Camera.main.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
         // Calculate the dimensions of the collider
         var districtData = district.GetComponent<District>();
         var middle = districtData.position;
@@ -410,6 +527,9 @@ public class UI : MonoBehaviour
             return;
         }
 
+        // Revert to top-down view
+        Camera.main.orthographic = false;
+        Camera.main.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
         // Calculate the dimensions of the collider
         Vector3 colliderSize = collider.bounds.size;
         float width = Math.Max(colliderSize.x, 50);
@@ -419,9 +539,6 @@ public class UI : MonoBehaviour
         var alpha = Camera.main.fieldOfView / 2;
         var a = Mathf.Max(width, height) / 2;
         var distance = a / Mathf.Tan(alpha * Mathf.Deg2Rad);
-
-        distance = Math.Min(distance, 990);
-        distance = Math.Max(distance, 50);
 
         // Set the camera position directly above the object
         Camera.main.transform.position = new Vector3(
@@ -568,6 +685,7 @@ public class UI : MonoBehaviour
     {
         EventListener.current.execute_show_eui();
     }
+
     private void reset_color()
     {
         EventListener.current.execute_reset_color();

@@ -528,7 +528,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 10000
   field of view: 60
-  orthographic: 0
+  orthographic: 1
   orthographic size: 5
   m_Depth: -1
   m_CullingMask:
@@ -601,8 +601,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bd02b2c4235e2b4bb59a6637c9fb517, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  size_x: 0
-  size_y: 0
+  width: 0
+  height: 0
+  position: {x: 0, y: 0, z: 0}
   camera_distance: 0
   district: {fileID: 856079031}
   maxEUI: 0
