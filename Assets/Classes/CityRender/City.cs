@@ -42,7 +42,7 @@ namespace CityRender
             List<string> district_names = building_class.GetFacilitiesNames();
             System.Random random = new System.Random();
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < district_names.Count; i++)
             {
                 GameObject new_district = Instantiate(district);
                 District script = new_district.GetComponent<District>();

@@ -2,6 +2,7 @@ using RectpackSharp;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace CityRender
@@ -65,35 +66,39 @@ namespace CityRender
                 int count = 0;
                 int y = 0;
                 int offset = 0;
+                int number_of_small_houses_in_row = number_of_houses_in_row;
                 for (int i = 0; i < small_rectangles.Length; ++i)
                 {
+                    number_of_small_houses_in_row = (int)(bounds.Height / small_rectangles[i].Width);
                     rectangles[count].X = small_rectangles[i].Width* (uint)(i - offset);
                     rectangles[count].Y = (uint)y;
                     count++;
-                    if (count % number_of_houses_in_row == 0) { y += (int)small_rectangles[i].Width;offset += number_of_houses_in_row; }
+                    if (count % number_of_small_houses_in_row == 0) { y += (int)small_rectangles[i].Width;offset += number_of_small_houses_in_row; }
                 }
                 if((middle_rectangles.Length == 0 && large_rectangles.Length == 0) && small_rectangles.Length > 0 && count % number_of_houses_in_row == 0)
                 {
                     y -= (int)small_rectangles[0].Width;
                 }
-                else if(small_rectangles.Length > 0 && count % number_of_houses_in_row != 0)
+                else if(small_rectangles.Length > 0 && count % number_of_small_houses_in_row != 0)
                 {
                     y += (int)small_rectangles[0].Width;
                 }
 
                 offset = 0;
+                int number_of_middle_houses_in_row = number_of_houses_in_row;
                 for (int i = 0; i < middle_rectangles.Length; ++i)
                 {
+                    number_of_middle_houses_in_row = (int)(bounds.Height / middle_rectangles[i].Width);
                     rectangles[count].X = middle_rectangles[i].Width * (uint)(i - offset);
                     rectangles[count].Y = (uint)y;
                     count++;
-                    if (count % number_of_houses_in_row == 0) { y += (int)middle_rectangles[i].Width; offset += number_of_houses_in_row; }
+                    if ((count- small_rectangles.Length % number_of_small_houses_in_row) % number_of_middle_houses_in_row == 0) { y += (int)middle_rectangles[i].Width; offset += number_of_middle_houses_in_row; }
                 }
-                if (large_rectangles.Length == 0 && middle_rectangles.Length > 0 && count % number_of_houses_in_row == 0)
+                if (large_rectangles.Length == 0 && middle_rectangles.Length > 0 && count % number_of_middle_houses_in_row == 0)
                 {
                     y -= (int)middle_rectangles[0].Width;
                 }
-                else if (middle_rectangles.Length > 0 && count % number_of_houses_in_row != 0)
+                else if (middle_rectangles.Length > 0 && count % number_of_middle_houses_in_row != 0)
                 {
                     y += (int)middle_rectangles[0].Width;
                 }
@@ -101,14 +106,12 @@ namespace CityRender
                 offset = 0;
                 for (int i = 0; i < large_rectangles.Length; ++i)
                 {
-                    Debug.Log("i: " + i + " offset: "+ offset);
                     rectangles[count].X = large_rectangles[i].Width * (uint)(i - offset);
                     rectangles[count].Y = (uint)y;
                     count++;
-                    Debug.Log("count: " + count + " number_of_houses_in_row " + number_of_houses_in_row);
-                    if (count % number_of_houses_in_row  == 0) { y += (int)large_rectangles[i].Width; offset += number_of_houses_in_row; }
+                    if ((count-(middle_rectangles.Length+small_rectangles.Length)% number_of_houses_in_row) % number_of_houses_in_row  == 0) { y += (int)large_rectangles[i].Width; offset += number_of_houses_in_row; }
                 }
-                if (large_rectangles.Length > 0 && count % number_of_houses_in_row == 0)
+                if (large_rectangles.Length > 0 && (count- (middle_rectangles.Length + small_rectangles.Length) % number_of_houses_in_row) % number_of_houses_in_row == 0)
                 {
                     y -= (int)large_rectangles[0].Width;
                 }
