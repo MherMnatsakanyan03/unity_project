@@ -13,6 +13,7 @@ namespace CityRender
 
         public float size_x = 0f;
         public float size_y = 0f;
+        public Vector3 postion = Vector3.zero;
 
         public float camera_distance = 0;
         public CityObj city_data;
@@ -46,6 +47,7 @@ namespace CityRender
                 copiedObject.Add(new_district);
             }
             arange_city(color_map);
+            Debug.Log("postion: " + postion);
         }
 
         private void arange_city(Dictionary<string, string> color_map)
@@ -53,6 +55,8 @@ namespace CityRender
             float new_postion_x = 0;
             float shift_x = 0;
             float sum_height = 0;
+            float offset = 0;
+            float postion_y = 0;
 
             int i = 0;
             foreach (GameObject district in copiedObject)
@@ -74,14 +78,15 @@ namespace CityRender
                 var width = -script.width/2 + district.GetComponent<BoxCollider>().center.z;
                 var height = -script.height / 2;
                 if (script.width > size_y) { size_y = script.width; }
+                if (script.width/2 - script.street_width / 2 > postion_y) { postion_y = script.width/2 -script.street_width / 2; }
 
                 new_postion_x = sum_height;
                 shift_x = new_postion_x - height;
-                if (i == 0) { shift_x = 0; }
-
+                if (i == 0) { shift_x = 0; offset = -script.height/2; }
+                size_x += script.height;
                 district.transform.position = new Vector3(0 + shift_x, 0, 0);
                 script.position = district.transform.position + new Vector3(0, 0, district.GetComponent<BoxCollider>().center.z);
-                size_x += script.height;
+                
 
                 if (i == 0)
                 {
@@ -94,6 +99,7 @@ namespace CityRender
 
                 i++;
             }
+            postion = new Vector3 (size_x/2+offset, 0, postion_y);
         }
 
         void Update()

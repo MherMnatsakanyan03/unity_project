@@ -180,6 +180,7 @@ namespace CityRender
                     if (x == 0 || y == 0 || x == width - 1 || y == height - 1)
                     {
                         GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        cube.transform.localScale = new Vector3(2,0.5f,2);
                         cube.transform.parent = parent;
                         this.house_copy = cube;
                         cube.GetComponent<Renderer>().material.color = pick_color();
