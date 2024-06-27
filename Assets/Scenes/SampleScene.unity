@@ -429,6 +429,7 @@ MonoBehaviour:
   height: 0
   street_width: 0
   districtSquareMeterSize: 40
+  grid: {fileID: 0}
   maxEUI: 0
 --- !u!4 &856079033
 Transform:
@@ -525,7 +526,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 10000
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -601,13 +602,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size_x: 0
-  size_minus_x: 0
   size_y: 0
-  size_minus_y: 0
-  buffer_size_x: 0
-  buffer_size_minus_x: 0
-  buffer_size_y: 0
-  buffer_size_minus_y: 0
   camera_distance: 0
   district: {fileID: 856079031}
   maxEUI: 0
