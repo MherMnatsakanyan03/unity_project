@@ -18,7 +18,8 @@ public class UI : MonoBehaviour
         prevCityButton,
         yellowBtn,
         greenBtn,
-        blueBtn;
+        blueBtn,
+        resetBtn;
 
     private IntegerField yearDisplay;
 
@@ -456,6 +457,7 @@ public class UI : MonoBehaviour
         greenBtn = root.Q<Button>("btn1");
         yellowBtn = root.Q<Button>("btn2");
         blueBtn = root.Q<Button>("btn3");
+        resetBtn = root.Q<Button>("btn4");
         house_data_list = root.Q<ListView>("house_data_list");
 
         upper_limit_colorbar = root.Q<Label>("UpperLimit");
@@ -517,6 +519,11 @@ public class UI : MonoBehaviour
             show_eui();
             enable_colorbar();
         };
+        resetBtn.clicked += () =>
+        {
+            reset_color();
+            disable_colorbar();
+        };
     }
 
     private void SetModeCity()
@@ -560,5 +567,9 @@ public class UI : MonoBehaviour
     private void show_eui()
     {
         EventListener.current.execute_show_eui();
+    }
+    private void reset_color()
+    {
+        EventListener.current.execute_reset_color();
     }
 }

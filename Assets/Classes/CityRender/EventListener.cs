@@ -13,6 +13,7 @@ namespace CityRender
         public event Action show_energy_star;
         public event Action show_year_build;
         public event Action show_eui;
+        public event Action reset_color;
 
         public event Action enableBoxColliderHouse, disableBoxColliderHouse;
 
@@ -56,18 +57,10 @@ namespace CityRender
             show_eui.Invoke();
         }
 
-        void Update()
+        internal void execute_reset_color()
         {
-            if (Input.GetKeyDown("space"))
-            {
-                show_energy_star.Invoke();
-            }
-            if (Input.GetKeyDown("a"))
-            {
-                RenderSettings.fog = true;
-                RenderSettings.fogDensity = 0.1f;
-                //RenderSettings.fogColor = Color.gray;
-            }
+            reset_color.Invoke();
         }
+
     }
 }

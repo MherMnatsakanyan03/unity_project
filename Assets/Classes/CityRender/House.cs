@@ -52,6 +52,7 @@ namespace CityRender
             EventListener.current.show_energy_star += show_energy_star;
             EventListener.current.show_year_build += show_year_build;
             EventListener.current.show_eui += show_eui;
+            EventListener.current.reset_color += reset_color;
         }
 
         private void enableBoxCollider()
@@ -149,6 +150,18 @@ namespace CityRender
             }
             
             
+        }
+
+        public void reset_color()
+        {
+            if (this.house.activeSelf == true)
+            {
+                this.house.GetComponent<Renderer>()
+                    .material.SetColor(
+                        "_Color",
+                        new Color(1, 1, 1, 1.0f)
+                    );
+            }
         }
     }
 }

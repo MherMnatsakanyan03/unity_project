@@ -47,7 +47,6 @@ namespace CityRender
                 copiedObject.Add(new_district);
             }
             arange_city(color_map);
-            Debug.Log("postion: " + postion);
         }
 
         private void arange_city(Dictionary<string, string> color_map)
