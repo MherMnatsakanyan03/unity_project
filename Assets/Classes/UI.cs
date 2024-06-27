@@ -54,8 +54,8 @@ public class UI : MonoBehaviour
 
         // Initialize
         SetYearDisplay(currentYearIndex);
-        CreateTest();
-        //CreateCitys();
+        //CreateTest();
+        CreateCitys();
         FocusCameraOnCity();
         diable_colorbar();
 
@@ -99,12 +99,12 @@ public class UI : MonoBehaviour
         int i = 0;
         foreach (Year year in years)
         {
-            if(i == 2)
+            if (i == 2)
             {
                 break;
             }
             Vector2 init_pos = new(0, i * 1000);
-            
+
             int j = 0;
             citiesObject.Add(new List<GameObject>());
             offsets.Add(new List<float>());
@@ -120,8 +120,8 @@ public class UI : MonoBehaviour
                 new_city.transform.position = new Vector3(init_pos.x, 0, init_pos.y);
 
                 var currentCity = new_city.GetComponent<City>();
-                var city_width = (currentCity.size_x + currentCity.size_x) * 3;
-                var city_height = (currentCity.size_y + currentCity.size_y) * 3;
+                var city_width = currentCity.size_y * 3;
+                var city_height = currentCity.size_x * 3;
 
                 init_pos.x += Math.Max(city_height, city_width) + 100;
 
@@ -135,8 +135,8 @@ public class UI : MonoBehaviour
                 if (j > 0)
                 {
                     var prevCity = citiesObject[i][j - 1].GetComponent<City>();
-                    var prevCity_width = (prevCity.size_x + prevCity.size_x) * 3;
-                    var prevCity_height = (prevCity.size_y + prevCity.size_y) * 3;
+                    var prevCity_width = prevCity.size_y * 3;
+                    var prevCity_height = prevCity.size_x * 3;
                     init_pos.x += Math.Max(prevCity_height, prevCity_width) + 100;
                 }
 
@@ -195,13 +195,14 @@ public class UI : MonoBehaviour
                     house_data_list.hierarchy.Add(new Label("EUI: " + eui));
                     house_data_list.hierarchy.Add(new Label("Energy Star: " + energy_star)); */
 
-                    List<string> items = new()
-                    {
-                        "House Type: " + house_type,
-                        "Year Build: " + year,
-                        "EUI: " + eui,
-                        "Energy Star: " + energy_star
-                    };
+                    List<string> items =
+                        new()
+                        {
+                            "House Type: " + house_type,
+                            "Year Build: " + year,
+                            "EUI: " + eui,
+                            "Energy Star: " + energy_star
+                        };
 
                     // Define a function to create UI elements
                     VisualElement makeItem() => new Label();
@@ -347,17 +348,13 @@ public class UI : MonoBehaviour
         var currentGameObject = citiesObject[currentYearIndex][currentCityIndex];
         var currentCity = currentGameObject.GetComponent<City>();
         var alpha = Camera.main.fieldOfView / 2;
-        var city_width = Math.Max(currentCity.size_x + currentCity.size_x, 100);
-        var city_height = Math.Max(currentCity.size_y + currentCity.size_y, 100);
-        var a = Math.Max(city_width, city_height);
+        var a = Math.Max(currentCity.size_y, currentCity.size_x) / 2;
         var distance = 0.8f * a / Mathf.Tan(alpha * Mathf.Deg2Rad);
 
-        distance = Math.Min(distance, 990);
-
         Camera.main.transform.position = new Vector3(
-            currentGameObject.transform.position.x,
+            currentGameObject.transform.position.x + currentCity.size_x / 2,
             distance,
-            currentGameObject.transform.position.z + 30
+            currentGameObject.transform.position.z + currentCity.size_y / 2
         );
         Debug.Log(
             "New Pos: "
@@ -388,8 +385,6 @@ public class UI : MonoBehaviour
         var alpha = Camera.main.fieldOfView / 2;
         var a = Mathf.Max(width, height) / 2;
         var distance = a / Mathf.Tan(alpha * Mathf.Deg2Rad);
-
-        distance = Math.Min(distance, 990);
 
         // Set the camera position directly above the object
         Camera.main.transform.position = new Vector3(
