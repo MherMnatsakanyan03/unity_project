@@ -11,8 +11,8 @@ namespace CityRender
     public class City : MonoBehaviour
     {
 
-        public float height = 0f;
-        public float width = 0f;
+        public float size_x = 0f;
+        public float size_y = 0f;
 
         public float camera_distance = 0;
         public CityObj city_data;
@@ -73,7 +73,7 @@ namespace CityRender
 
                 var width = -script.width/2 + district.GetComponent<BoxCollider>().center.z;
                 var height = -script.height / 2;
-                if (script.width > width) { width = script.width; }
+                if (script.width > size_y) { size_y = script.width; }
                 switch (i)
                 {
                     case 0:
@@ -84,7 +84,7 @@ namespace CityRender
                         shift_x = new_postion_x - height;
 
                         district.transform.position = new Vector3(0 + shift_x, 0, 0);
-                        height += script.height;
+                        size_x += script.height;
 
                         break;
                     case 2:
@@ -92,7 +92,7 @@ namespace CityRender
                         shift_x = new_postion_x - height;
 
                         district.transform.position = new Vector3(0 + shift_x, 0, 0);
-                        height += script.height;
+                        size_x += script.height;
 
                         break;
                     case 3:
@@ -100,7 +100,7 @@ namespace CityRender
                         shift_x = new_postion_x - height;
 
                         district.transform.position = new Vector3(0 + shift_x, 0, 0);
-                        height += script.height;
+                        size_x += script.height;
 
                         break;
                     case 4:
@@ -108,7 +108,7 @@ namespace CityRender
                         shift_x = new_postion_x - height;
 
                         district.transform.position = new Vector3(0 + shift_x, 0, 0);
-                        height += script.height;
+                        size_x += script.height;
 
                         break;
                     case 5:
@@ -116,7 +116,7 @@ namespace CityRender
                         shift_x = new_postion_x - height;
 
                         district.transform.position = new Vector3(0 + shift_x, 0, 0);
-                        height += script.height;
+                        size_x += script.height;
 
                         break;
                     case 6:
@@ -124,7 +124,7 @@ namespace CityRender
                         shift_x = new_postion_x - height;
 
                         district.transform.position = new Vector3(0 + shift_x, 0, 0);
-                        height += script.height;
+                        size_x += script.height;
 
                         break;
                     case 7:
@@ -132,7 +132,7 @@ namespace CityRender
                         shift_x = new_postion_x - height;
 
                         district.transform.position = new Vector3(0 + shift_x, 0, 0);
-                        height += script.height;
+                        size_x += script.height;
 
                         break;
                     case 8:
@@ -140,7 +140,7 @@ namespace CityRender
                         shift_x = new_postion_x - height;
 
                         district.transform.position = new Vector3(0 + shift_x, 0, 0);
-                        height += script.height;
+                        size_x += script.height;
 
                         break;
                     default:
