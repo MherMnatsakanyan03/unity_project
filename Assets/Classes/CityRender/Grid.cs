@@ -41,6 +41,8 @@ namespace CityRender
         private List<CityData.House> houses;
         private double maxEUI;
 
+        private Dictionary<string, string> color_map = new();
+
         public Grid(
             Transform parent,
             float cellSize,
@@ -76,7 +78,9 @@ namespace CityRender
             PackingRectangle[] small_rectangles = new PackingRectangle[this.number_houses[0]];
             PackingRectangle[] middle_rectangles = new PackingRectangle[this.number_houses[1]];
             PackingRectangle[] large_rectangles = new PackingRectangle[this.number_houses[2]];
-            Debug.Log(this.number_houses[0] + " " + this.number_houses[1] + " " + this.number_houses[2]);
+            Debug.Log(
+                this.number_houses[0] + " " + this.number_houses[1] + " " + this.number_houses[2]
+            );
             int id = 0;
             for (int i = 0; i < small_rectangles.Length; i++)
             {
@@ -102,7 +106,11 @@ namespace CityRender
                 id++;
             }
 
-            Packing house_positions = new Packing(small_rectangles, middle_rectangles, large_rectangles);
+            Packing house_positions = new Packing(
+                small_rectangles,
+                middle_rectangles,
+                large_rectangles
+            );
             house_positions.pack();
 
             house_x = new List<float>(house_positions.rectangles.Length);
@@ -148,47 +156,23 @@ namespace CityRender
 
         public Color pick_color()
         {
-            Debug.Log(this.district_type);
-            switch (this.district_type)
-            {
-                
-                case "Food":
-                    Debug.Log("Food");
-                    return new Color(255, 0, 0);
-                case "Warehouse":
-                    Debug.Log("Warehouse");
-                    return new Color(0, 255, 0);
-                case "Retail":
-                    Debug.Log("Retail");
-                    return new Color(0, 0, 255);
-                case "Education":
-                    Debug.Log("Education");
-                    return new Color(255, 255, 0);
-                case "Office":
-                    Debug.Log("Office");
-                    return new Color(255, 0, 255);
-                case "Commercial":
-                    Debug.Log("Commercial");
-                    return new Color(0, 255, 255);
-                case "Public":
-                    Debug.Log("Public");
-                    return new Color(255, 165, 0);
-                case "Health_Care":
-                    Debug.Log("Health_Care");
-                    return new Color(128f, 0, 128f,10f);
-                case "Peoples":
-                    Debug.Log("Peoples");
-                    return new Color(64, 224, 208);
-                default:
-                    return new Color(0, 0, 0);
-            }
-            
+            color_map.TryGetValue(this.district_type, out string color);
+            color ??= "#FFFFFF";
+
+            int r = Convert.ToInt32(color.Substring(1, 2), 16);
+            int g = Convert.ToInt32(color.Substring(3, 2), 16);
+            int b = Convert.ToInt32(color.Substring(5, 2), 16);
+
+            return new Color(r / 255f, g / 255f, b / 255f);
+        }
+
+        public void SetColorMap(Dictionary<string, string> color_map)
+        {
+            this.color_map = color_map;
         }
 
         public void drawOutlines()
         {
-
-
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
@@ -229,13 +213,12 @@ namespace CityRender
             this.counter = 0;
             for (int j = 0; j < 2; j++)
             {
-                
                 if (i >= this.number_houses_cum_sum[this.counter] && this.counter < 2)
                 {
                     this.counter++;
                 }
             }
-            
+
             return this.house_width[counter];
         }
 

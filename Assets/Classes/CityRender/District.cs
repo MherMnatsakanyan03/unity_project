@@ -25,10 +25,12 @@ namespace CityRender
         public float street_width;
         public float districtSquareMeterSize = 40f;
 
+        public Grid grid;
+
         public Facility facility_data;
         public double maxEUI;
 
-        public void create_district()
+        public void create_district(Dictionary<string, string> color_map)
         {
             List<int> houses_area = new List<int>
                 {
@@ -43,7 +45,7 @@ namespace CityRender
                 (int)facility_data.GetCountPart(2)
                 };
 
-            Grid grid = new Grid(
+            grid = new Grid(
                     gameObject.transform,
                     1,
                     0,
@@ -90,7 +92,7 @@ namespace CityRender
                 //Create Houses
                 //get_house_modells(district_type);
 
-                
+                grid.SetColorMap(color_map);
                 grid.drawOutlines();
 
                 EventListener.current.enableBoxColliderDistrict += enableBoxCollider;

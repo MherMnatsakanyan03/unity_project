@@ -43,6 +43,7 @@ public class UI : MonoBehaviour
     private GameObject initCity;
 
     private List<List<GameObject>> citiesObject = new();
+    private Dictionary<string, string> color_dict = new();
 
     void Start()
     {
@@ -53,8 +54,8 @@ public class UI : MonoBehaviour
 
         // Initialize
         SetYearDisplay(currentYearIndex);
-        CreateTest();
-        //CreateCitys();
+        //CreateTest();
+        CreateCitys();
         FocusCameraOnCity();
         diable_colorbar();
 
@@ -89,7 +90,7 @@ public class UI : MonoBehaviour
         GameObject new_city = Instantiate(initCity);
         City script = new_city.GetComponent<City>();
         script.city_data = city_obj;
-        script.create_city();
+        script.create_city(color_dict);
         citiesObject[0].Add(new_city);
     }
 
@@ -98,7 +99,11 @@ public class UI : MonoBehaviour
         int i = 0;
         foreach (Year year in years)
         {
-            Vector2 init_pos = new Vector2(0, i * 1000);
+            if(i == 2)
+            {
+                break;
+            }
+            Vector2 init_pos = new(0, i * 1000);
             
             int j = 0;
             citiesObject.Add(new List<GameObject>());
@@ -110,7 +115,7 @@ public class UI : MonoBehaviour
                 GameObject new_city = Instantiate(initCity);
                 City script = new_city.GetComponent<City>();
                 script.city_data = city_obj;
-                script.create_city();
+                script.create_city(color_dict);
 
                 new_city.transform.position = new Vector3(init_pos.x, 0, init_pos.y);
 
@@ -190,7 +195,7 @@ public class UI : MonoBehaviour
                     house_data_list.hierarchy.Add(new Label("EUI: " + eui));
                     house_data_list.hierarchy.Add(new Label("Energy Star: " + energy_star)); */
 
-                    List<string> items = new List<string>
+                    List<string> items = new()
                     {
                         "House Type: " + house_type,
                         "Year Build: " + year,
@@ -432,6 +437,7 @@ public class UI : MonoBehaviour
         // Load Data
         csvReader = new CSVReader();
         years = csvReader.GetData();
+        color_dict = csvReader.GetFacilityColorMap();
     }
 
     /**
