@@ -54,8 +54,8 @@ public class UI : MonoBehaviour
 
         // Initialize
         SetYearDisplay(currentYearIndex);
-        //CreateTest();
-        CreateCitys();
+        CreateTest();
+        //CreateCitys();
         FocusCameraOnCity();
         diable_colorbar();
 
@@ -120,8 +120,8 @@ public class UI : MonoBehaviour
                 new_city.transform.position = new Vector3(init_pos.x, 0, init_pos.y);
 
                 var currentCity = new_city.GetComponent<City>();
-                var city_width = (currentCity.size_x + currentCity.size_minus_x) * 3;
-                var city_height = (currentCity.size_y + currentCity.size_minus_y) * 3;
+                var city_width = (currentCity.size_x + currentCity.size_x) * 3;
+                var city_height = (currentCity.size_y + currentCity.size_y) * 3;
 
                 init_pos.x += Math.Max(city_height, city_width) + 100;
 
@@ -135,8 +135,8 @@ public class UI : MonoBehaviour
                 if (j > 0)
                 {
                     var prevCity = citiesObject[i][j - 1].GetComponent<City>();
-                    var prevCity_width = (prevCity.size_x + prevCity.size_minus_x) * 3;
-                    var prevCity_height = (prevCity.size_y + prevCity.size_minus_y) * 3;
+                    var prevCity_width = (prevCity.size_x + prevCity.size_x) * 3;
+                    var prevCity_height = (prevCity.size_y + prevCity.size_y) * 3;
                     init_pos.x += Math.Max(prevCity_height, prevCity_width) + 100;
                 }
 
@@ -347,8 +347,8 @@ public class UI : MonoBehaviour
         var currentGameObject = citiesObject[currentYearIndex][currentCityIndex];
         var currentCity = currentGameObject.GetComponent<City>();
         var alpha = Camera.main.fieldOfView / 2;
-        var city_width = Math.Max(currentCity.size_x + currentCity.size_minus_x, 100);
-        var city_height = Math.Max(currentCity.size_y + currentCity.size_minus_y, 100);
+        var city_width = Math.Max(currentCity.size_x + currentCity.size_x, 100);
+        var city_height = Math.Max(currentCity.size_y + currentCity.size_y, 100);
         var a = Math.Max(city_width, city_height);
         var distance = 0.8f * a / Mathf.Tan(alpha * Mathf.Deg2Rad);
 
