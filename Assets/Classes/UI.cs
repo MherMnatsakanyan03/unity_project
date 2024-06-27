@@ -57,7 +57,7 @@ public class UI : MonoBehaviour
         CreateTest();
         //CreateCitys();
         FocusCameraOnCity();
-        diable_colorbar();
+        disable_colorbar();
 
         // Log all cities
         string log = "";
@@ -155,9 +155,12 @@ public class UI : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0)) // �berpr�fen, ob die linke Maustaste gedr�ckt wurde
         {
+            Vector3 mousePosition = Input.mousePosition;
+            float screenHeight = Screen.height;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // Erzeugen eines Strahls von der Mausposition
 
-            if (Physics.Raycast(ray, out RaycastHit hit)) // �berpr�fen, ob der Strahl ein GameObject getroffen hat
+            // Falls Objekt getroffen wurde und Mausposition nicht in den oberen 10% oder unteren 10% des Bildschirms
+            if (Physics.Raycast(ray, out RaycastHit hit) && mousePosition.y > 0.1f * screenHeight && mousePosition.y < 0.9f * screenHeight) // �berpr�fen, ob der Strahl ein GameObject getroffen hat
             {
                 // View of City
                 if (currentMode == 0)
@@ -248,7 +251,7 @@ public class UI : MonoBehaviour
      */
     private void NextYear()
     {
-        if (currentYearIndex < citiesObject.Count - 1 && currentMode == 0)
+        if (currentYearIndex < citiesObject.Count - 1)
         {
             Debug.Log("Year: " + currentYearIndex + ",\tCity: " + currentCityIndex);
             var oldCity = citiesObject[currentYearIndex][currentCityIndex];
@@ -271,6 +274,7 @@ public class UI : MonoBehaviour
             SetModeCity();
             SetYearDisplay(currentYearIndex);
             FocusCameraOnCity();
+            disable_colorbar();
         }
     }
 
@@ -279,7 +283,7 @@ public class UI : MonoBehaviour
      */
     private void PrevYear()
     {
-        if (currentYearIndex > 0 && currentMode == 0)
+        if (currentYearIndex > 0)
         {
             Debug.Log("Year: " + currentYearIndex + ",\tCity: " + currentCityIndex);
 
@@ -302,7 +306,7 @@ public class UI : MonoBehaviour
             SetModeCity();
             SetYearDisplay(currentYearIndex);
             FocusCameraOnCity();
-            diable_colorbar();
+            disable_colorbar();
         }
     }
 
@@ -320,9 +324,10 @@ public class UI : MonoBehaviour
      */
     private void NextCity()
     {
-        if (currentCityIndex < citiesObject[currentYearIndex].Count - 1 && currentMode == 0)
+        if (currentCityIndex < citiesObject[currentYearIndex].Count - 1)
         {
             currentCityIndex++;
+            SetModeCity();
             FocusCameraOnCity();
         }
     }
@@ -332,9 +337,10 @@ public class UI : MonoBehaviour
      */
     private void PrevCity()
     {
-        if (currentCityIndex > 0 && currentMode == 0)
+        if (currentCityIndex > 0)
         {
             currentCityIndex--;
+            SetModeCity();
             FocusCameraOnCity();
         }
     }
@@ -457,7 +463,7 @@ public class UI : MonoBehaviour
         colorbar = root.Q<VisualElement>("Colorbar");
     }
 
-    private void diable_colorbar()
+    private void disable_colorbar()
     {
         upper_limit_colorbar.style.display = DisplayStyle.None;
         bottom_limit_colorbar.style.display = DisplayStyle.None;
