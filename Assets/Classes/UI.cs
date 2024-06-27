@@ -96,9 +96,10 @@ public class UI : MonoBehaviour
     private void CreateCitys()
     {
         int i = 0;
-        Vector2 init_pos = new Vector2(0, 0);
         foreach (Year year in years)
         {
+            Vector2 init_pos = new Vector2(0, i * 1000);
+            
             int j = 0;
             citiesObject.Add(new List<GameObject>());
             offsets.Add(new List<float>());
@@ -138,9 +139,6 @@ public class UI : MonoBehaviour
 
                 j++;
             }
-
-            init_pos.x = 0;
-            init_pos.y += 1000;
             i++;
         }
         SetModeCity();
