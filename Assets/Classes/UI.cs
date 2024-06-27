@@ -57,7 +57,7 @@ public class UI : MonoBehaviour
         //CreateTest();
         CreateCitys();
         FocusCameraOnCity();
-        diable_colorbar();
+        disable_colorbar();
 
         // Log all cities
         string log = "";
@@ -274,7 +274,7 @@ public class UI : MonoBehaviour
             SetModeCity();
             SetYearDisplay(currentYearIndex);
             FocusCameraOnCity();
-            diable_colorbar();
+            disable_colorbar();
         }
     }
 
@@ -306,7 +306,7 @@ public class UI : MonoBehaviour
             SetModeCity();
             SetYearDisplay(currentYearIndex);
             FocusCameraOnCity();
-            diable_colorbar();
+            disable_colorbar();
         }
     }
 
@@ -463,7 +463,7 @@ public class UI : MonoBehaviour
         colorbar = root.Q<VisualElement>("Colorbar");
     }
 
-    private void diable_colorbar()
+    private void disable_colorbar()
     {
         upper_limit_colorbar.style.display = DisplayStyle.None;
         bottom_limit_colorbar.style.display = DisplayStyle.None;
