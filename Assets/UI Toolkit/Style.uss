@@ -30,3 +30,10 @@
 .switchButton:active {
     background-image: url("project://database/Assets/UI%20Toolkit/Textures/right_arrow_yellow.png?fileID=2800000&guid=6d3781cc173e31f41a4bc3b713c49ccd&type=3#right_arrow_yellow");
 }
+
+.labelStyle {
+    -unity-text-outline-width: 2px;
+    color: rgb(255, 255, 255);
+    -unity-text-outline-color: rgb(0, 0, 0);
+    -unity-font-style: bold;
+}

@@ -12,6 +12,10 @@ using House_data = CityRender.House_data;
 
 public class UI : MonoBehaviour
 {
+    private float CAMERA_ANGLE = 40f;
+    private float TAN_CAMERA_ANGLE;
+    private float CAMERA_Z = 1000f;
+    private float CAMERA_Z_OFFSET;
     private VisualElement root;
     private Button nextYearButton,
         prevYearButton,
@@ -27,6 +31,7 @@ public class UI : MonoBehaviour
     private VisualElement colorbar;
     private Label upper_limit_colorbar;
     private Label bottom_limit_colorbar;
+    private Label cityDisplay;
 
     private ListView house_data_list;
 
@@ -49,8 +54,12 @@ public class UI : MonoBehaviour
 
     void Start()
     {
+        TAN_CAMERA_ANGLE = Mathf.Tan(CAMERA_ANGLE * Mathf.Deg2Rad);
+        CAMERA_Z_OFFSET = CAMERA_Z / TAN_CAMERA_ANGLE;
+
         LoadData();
         GetUIComponents();
+        CreateColorLegend();
 
         InitButtonFunctions();
 
@@ -149,6 +158,53 @@ public class UI : MonoBehaviour
             i++;
         }
         SetModeCity();
+    }
+
+    private Color ParseColor(string color)
+    {
+        color ??= "#FFFFFF";
+
+        int r = Convert.ToInt32(color.Substring(1, 2), 16);
+        int g = Convert.ToInt32(color.Substring(3, 2), 16);
+        int b = Convert.ToInt32(color.Substring(5, 2), 16);
+
+        return new Color(r / 255f, g / 255f, b / 255f);
+    }
+
+    private void CreateColorLegend()
+    {
+        VisualElement overlayContainer = new();
+        overlayContainer.style.position = Position.Absolute;
+        overlayContainer.style.top = 0;
+        overlayContainer.style.right = 0;
+        overlayContainer.BringToFront(); // Ensure this is higher than the existing UI elements
+
+        root.Add(overlayContainer);
+
+        foreach (var pair in color_dict)
+        {
+            VisualElement facilityElement = new();
+            facilityElement.style.flexDirection = FlexDirection.Row;
+            facilityElement.style.alignItems = Align.Center; // Align items vertically centered
+
+            // Create a color box
+            VisualElement colorBox = new();
+            colorBox.style.width = 22;
+            colorBox.style.height = 22;
+            colorBox.style.backgroundColor = ParseColor(pair.Value);
+            facilityElement.Add(colorBox);
+
+            // Create a label for the facility name
+            Label facilityLabel = new(pair.Key);
+            facilityLabel.style.fontSize = 18;
+            facilityLabel.style.height = 20; // Match the height of the color box
+            facilityLabel.style.marginLeft = 5; // Add some space between the color box and the label
+            facilityLabel.AddToClassList("labelStyle");
+            facilityElement.Add(facilityLabel);
+
+            // Add the facility element to the overlay container
+            overlayContainer.Add(facilityElement);
+        }
     }
 
     private GameObject currentDistrict = null;
@@ -265,9 +321,10 @@ public class UI : MonoBehaviour
                 var left_bound = current_city_pos - current_city.width / 2;
 
                 var width = current_city.width;
+                var step = width / 100 * Camera.main.orthographicSize / current_city.height;
 
                 Camera.main.transform.position = new Vector3(
-                    Mathf.Max(left_bound, Camera.main.transform.position.x - width / 100),
+                    Mathf.Max(left_bound, Camera.main.transform.position.x - step),
                     Camera.main.transform.position.y,
                     Camera.main.transform.position.z
                 );
@@ -282,9 +339,10 @@ public class UI : MonoBehaviour
                 var right_bound = current_city_pos + current_city.width / 2;
 
                 var width = current_city.width;
+                var step = width / 100 * Camera.main.orthographicSize / current_city.height;
 
                 Camera.main.transform.position = new Vector3(
-                    Mathf.Min(right_bound, Camera.main.transform.position.x + width / 100),
+                    Mathf.Min(right_bound, Camera.main.transform.position.x + step),
                     Camera.main.transform.position.y,
                     Camera.main.transform.position.z
                 );
@@ -294,15 +352,22 @@ public class UI : MonoBehaviour
                 var current_city = citiesObject[currentYearIndex]
                     [currentCityIndex]
                     .GetComponent<City>();
-                var current_city_pos = current_city.position.y + currentYearIndex * 1000;
+
+                float currentCamY = Camera.main.transform.position.y;
+
+                var current_city_pos =
+                    current_city.position.y
+                    + currentYearIndex * 1000
+                    - currentCamY / TAN_CAMERA_ANGLE;
                 var upper_bound = current_city_pos + current_city.height / 2;
 
                 var height = current_city.height;
+                var step = 0.0001f * height * Camera.main.orthographicSize;
 
                 Camera.main.transform.position = new Vector3(
                     Camera.main.transform.position.x,
                     Camera.main.transform.position.y,
-                    Mathf.Min(upper_bound, Camera.main.transform.position.z + height / 100)
+                    Mathf.Min(upper_bound, Camera.main.transform.position.z + step)
                 );
             }
             if (Input.GetKey(KeyCode.DownArrow))
@@ -310,15 +375,22 @@ public class UI : MonoBehaviour
                 var current_city = citiesObject[currentYearIndex]
                     [currentCityIndex]
                     .GetComponent<City>();
-                var current_city_pos = current_city.position.y + currentYearIndex * 1000;
+
+                float currentCamY = Camera.main.transform.position.y;
+
+                var current_city_pos =
+                    current_city.position.y
+                    + currentYearIndex * 1000
+                    - currentCamY / TAN_CAMERA_ANGLE;
                 var lower_bound = current_city_pos - current_city.height / 2;
 
                 var height = current_city.height;
+                var step = 0.0001f * height * Camera.main.orthographicSize;
 
                 Camera.main.transform.position = new Vector3(
                     Camera.main.transform.position.x,
                     Camera.main.transform.position.y,
-                    Mathf.Max(lower_bound, Camera.main.transform.position.z - height / 100)
+                    Mathf.Max(lower_bound, Camera.main.transform.position.z - step)
                 );
             }
             if (Input.GetKey(KeyCode.LeftShift))
@@ -329,7 +401,10 @@ public class UI : MonoBehaviour
 
                 var current_size = Camera.main.orthographicSize;
 
-                if(Camera.main.orthographicSize <= Math.Max(current_city.width, current_city.height))
+                if (
+                    Camera.main.orthographicSize
+                    <= Math.Max(current_city.width, current_city.height)
+                )
                 {
                     Camera.main.orthographicSize += current_size / 100;
                 }
@@ -341,8 +416,9 @@ public class UI : MonoBehaviour
                     .GetComponent<City>();
 
                 var current_size = Camera.main.orthographicSize;
-                
-                if(Camera.main.orthographicSize >= 10) {
+
+                if (Camera.main.orthographicSize >= 10)
+                {
                     Camera.main.orthographicSize -= current_size / 100;
                 }
             }
@@ -471,17 +547,18 @@ public class UI : MonoBehaviour
         //If camera is Orthographic
         // Change the width and height parameters to the aspect ratio of the camera
         Camera.main.orthographic = true;
-        var aspect = Camera.main.aspect;
         var width = currentCity.width;
         var height = currentCity.height;
 
-        // Change the angle of the camera
-
         Camera.main.orthographicSize = Math.Max(width, height) / 2;
-        Camera.main.transform.position = new Vector3(
-            currentCity.position.x + offsets[currentYearIndex][currentCityIndex],
-            100,
-            currentCity.position.y + currentYearIndex * 1000
+
+        var newCamX = currentCity.position.x + offsets[currentYearIndex][currentCityIndex];
+        var newCamY = CAMERA_Z;
+        var newCamZ = currentCity.position.y + currentYearIndex * 1000 - CAMERA_Z_OFFSET;
+
+        Camera.main.transform.SetPositionAndRotation(
+            new Vector3(newCamX, newCamY, newCamZ),
+            Quaternion.Euler(CAMERA_ANGLE, 0f, 0f)
         );
     }
 
@@ -508,10 +585,13 @@ public class UI : MonoBehaviour
         var distance = a / Mathf.Tan(alpha * Mathf.Deg2Rad);
 
         // Set the camera position directly above the object
-        Camera.main.transform.position = new Vector3(
-            middle.x + offsets[currentYearIndex][currentCityIndex],
-            distance,
-            middle.z + currentYearIndex * 1000 // Assuming 2D (X-Z plane)
+        Camera.main.transform.SetPositionAndRotation(
+            new Vector3(
+                middle.x + offsets[currentYearIndex][currentCityIndex],
+                distance,
+                middle.z + currentYearIndex * 1000 // Assuming 2D (X-Z plane)
+            ),
+            Quaternion.Euler(90f, 0f, 0f)
         );
     }
 
@@ -577,6 +657,8 @@ public class UI : MonoBehaviour
         upper_limit_colorbar = root.Q<Label>("UpperLimit");
         bottom_limit_colorbar = root.Q<Label>("BottomLimit");
         colorbar = root.Q<VisualElement>("Colorbar");
+
+        cityDisplay = root.Q<Label>("cityDisplay");
     }
 
     private void disable_colorbar()
@@ -647,6 +729,13 @@ public class UI : MonoBehaviour
 
         house_data_list.itemsSource = null; // Reassign the itemsSource
 
+        cityDisplay.text =
+            "City: "
+            + citiesObject[currentYearIndex]
+                [currentCityIndex]
+                .GetComponent<City>()
+                .city_data.city_id;
+
         currentMode = 0;
     }
 
@@ -657,6 +746,8 @@ public class UI : MonoBehaviour
 
         house_data_list.itemsSource = null; // Reassign the itemsSource
 
+        cityDisplay.text = "District: " + currentDistrict.GetComponent<District>().district_type;
+
         currentMode = 1;
     }
 
@@ -664,6 +755,8 @@ public class UI : MonoBehaviour
     {
         EventListener.current.execute_disableBoxColliderDistrict();
         EventListener.current.execute_disableBoxColliderHouse();
+
+        cityDisplay.text = "";
 
         currentMode = 2;
     }
