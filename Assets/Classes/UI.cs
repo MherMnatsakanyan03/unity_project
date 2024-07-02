@@ -709,11 +709,13 @@ public class UI : MonoBehaviour
         {
             show_year_build();
             enable_colorbar();
+            change_text("100 %", "0");
         };
         blueBtn.clicked += () =>
         {
             show_eui();
             enable_colorbar();
+            change_text("100 %", "0");
         };
         resetBtn.clicked += () =>
         {

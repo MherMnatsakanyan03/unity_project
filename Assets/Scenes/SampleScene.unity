@@ -572,6 +572,124 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09016ab73178ff643ba0980a54704320, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1093645903
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1093645906}
+  - component: {fileID: 1093645905}
+  - component: {fileID: 1093645904}
+  m_Layer: 0
+  m_Name: GraphHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1093645904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1093645903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df4b0ef3dec8fca4190310c79ebe987b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  updatePeriod: 5
+  graphSize: {x: 400, y: 200}
+  graphScale: {x: 50, y: 50}
+  backgroundColor: {r: 0, g: 0, b: 0, a: 1}
+  outlineWidth: 5
+  outlineColor: {r: 0, g: 0.8, b: 1, a: 1}
+  lineWidth: 8
+  lineColor: {r: 1, g: 0.35, b: 0, a: 1}
+  PointSprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  pointRadius: 2
+  pointColor: {r: 1, g: 0.35, b: 0, a: 1}
+  pointHoverRadius: 15
+  PointHoverSpeed: 5
+  pointHoverColor: {r: 1, g: 0.6, b: 0, a: 1}
+  pointLockedRadius: 17
+  PointLockedSpeed: 5
+  pointLockedColor: {r: 1, g: 0.8, b: 0, a: 1}
+  unfixedPointOutlineWidth: 10
+  unfixedPointOutlineColor: {r: 0, g: 0.8, b: 1, a: 1}
+  unfixedPointOutlineHoverWidth: 15
+  UnfixedPointOutlineHoverSpeed: 5
+  unfixedPointOutlineHoverColor: {r: 0, g: 0.5, b: 1, a: 1}
+  fixedPointOutlineWidth: 17
+  FixedPointOutlineSpeed: 5
+  fixedPointOutlineColor: {r: 0, g: 0.8, b: 1, a: 1}
+  GridTextFont: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  gridSpacing: {x: 1, y: 1}
+  xAxisWidth: 3
+  xAxisColor: {r: 0, g: 0.8, b: 1, a: 1}
+  xAxisTextColor: {r: 0, g: 0.8, b: 1, a: 1}
+  xAxisTextSize: 10
+  xAxisTextOffset: 10
+  yAxisWidth: 3
+  yAxisColor: {r: 0, g: 0.8, b: 1, a: 1}
+  yAxisTextColor: {r: 0, g: 0.8, b: 1, a: 1}
+  yAxisTextSize: 10
+  yAxisTextOffset: 10
+  xGridWidth: 2
+  xGridColor: {r: 0, g: 0.8, b: 1, a: 0.6}
+  yGridWidth: 2
+  yGridColor: {r: 0, g: 0.8, b: 1, a: 0.6}
+  zoomSelectionColor: {r: 0, g: 0.8, b: 1, a: 0.2}
+  zoomSelectionOutlineWidth: 5
+  zoomSelectionOutlineColor: {r: 0, g: 0.8, b: 1, a: 0.6}
+  pointSelectionColor: {r: 1, g: 0.35, b: 0, a: 0.2}
+  pointSelectionOutlineWidth: 5
+  pointSelectionOutlineColor: {r: 1, g: 0.35, b: 0, a: 0.4}
+  ZoomSpeed: 5
+  SmoothZoomSpeed: 20
+  SmoothMoveSpeed: 20
+--- !u!114 &1093645905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1093645903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16ce44c0fd5628d4c8f002927517d529, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  updateGraph: 0
+  canvas: {fileID: 0}
+  activePointIndex: -1
+  fixedPointIndex: -1
+  mouseActionType: 0
+  rectangleType: 0
+  rectangleSelectionType: 0
+  rectangleSelectionPhase: 0
+  pointSelectionType: 0
+  targetZoom: {x: 1, y: 1}
+  targetMoveOffset: {x: 0, y: 0}
+--- !u!4 &1093645906
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1093645903}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 387.37714, y: -158.75977, z: 807.3547}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1331657141
 GameObject:
   m_ObjectHideFlags: 0
@@ -740,3 +858,4 @@ SceneRoots:
   - {fileID: 1331657143}
   - {fileID: 856079033}
   - {fileID: 1862333113}
+  - {fileID: 1093645906}

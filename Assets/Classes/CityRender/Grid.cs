@@ -78,9 +78,6 @@ namespace CityRender
             PackingRectangle[] small_rectangles = new PackingRectangle[this.number_houses[0]];
             PackingRectangle[] middle_rectangles = new PackingRectangle[this.number_houses[1]];
             PackingRectangle[] large_rectangles = new PackingRectangle[this.number_houses[2]];
-            Debug.Log(
-                this.number_houses[0] + " " + this.number_houses[1] + " " + this.number_houses[2]
-            );
             int id = 0;
             for (int i = 0; i < small_rectangles.Length; i++)
             {
@@ -149,8 +146,8 @@ namespace CityRender
             foreach (var area in this.houses_area)
             {
                 var a = (float)Math.Sqrt((double)area);
-                this.house_width.Add(a);
-                this.house_height.Add(a);
+                this.house_width.Add(a*2);
+                this.house_height.Add(a*2);
             }
         }
 
@@ -180,6 +177,7 @@ namespace CityRender
                     if (x == 0 || y == 0 || x == width - 1 || y == height - 1)
                     {
                         GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        cube.GetComponent<BoxCollider>().enabled = false;
                         cube.transform.localScale = new Vector3(2,0.5f,2);
                         cube.transform.parent = parent;
                         this.house_copy = cube;
@@ -248,7 +246,8 @@ namespace CityRender
             }
 
             var x = (int)Math.Sqrt((double)this.houses_area[counter]);
-            this.cube.transform.localScale = new Vector3(x, x, x);
+            this.cube.transform.localScale = new Vector3(x*2, x*2, x*2);
+
             house_type = house_types[counter];
             return this.cube;
         }
