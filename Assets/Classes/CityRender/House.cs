@@ -86,20 +86,22 @@ namespace CityRender
 
         public void show_energy_star()
         {
-            if (this.house.activeSelf == true) {
+            if (this.house.activeSelf == true)
+            {
                 if (this.energy_star == -1)
                 {
                     this.house.GetComponent<Renderer>()
-                    .material.SetColor("_Color", new Color(0.5f, 0.5f, 0.5f, 1.0f));
+                        .material.SetColor("_Color", new Color(0.5f, 0.5f, 0.5f, 1.0f));
                 }
                 else
                 {
                     this.house.GetComponent<Renderer>()
-                    .material.SetColor("_Color", this.gradient.Evaluate(this.energy_star / 100f));
+                        .material.SetColor(
+                            "_Color",
+                            this.gradient.Evaluate(this.energy_star / 100f)
+                        );
                 }
             }
-            
-            
         }
 
         public void show_year_build()
@@ -109,22 +111,19 @@ namespace CityRender
                 if (this.year_build == -1)
                 {
                     this.house.GetComponent<Renderer>()
-                    .material.SetColor(
-                        "_Color",
-                        new Color(0.5f, 0.5f, 0.5f, 1.0f)
-                    );
+                        .material.SetColor("_Color", new Color(0.5f, 0.5f, 0.5f, 1.0f));
                 }
                 else
                 {
-                    this.house.GetComponent<Renderer>()
-                    .material.SetColor(
-                        "_Color",
-                        this.gradient.Evaluate(this.year_build / (float)this.relativ_year_build)
+                    float normalizedYear = Mathf.Clamp(
+                        (this.year_build - 1800) / (2010f - 1850f),
+                        0f,
+                        1f
                     );
+                    this.house.GetComponent<Renderer>()
+                        .material.SetColor("_Color", this.gradient.Evaluate(normalizedYear));
                 }
             }
-            
-            
         }
 
         public void show_eui()
@@ -135,19 +134,28 @@ namespace CityRender
                 {
                     this.eui_bar = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     this.eui_bar.GetComponent<BoxCollider>().enabled = false;
-                    this.eui_bar.transform.localScale = new Vector3(2f, this.eui / (float)this.relativ_eui * 200, 2f);
-                    this.eui_bar.transform.position = this.house.transform.position + new Vector3(0, this.house.transform.localScale.y + this.eui / (float)this.relativ_eui * 200/2, 0);
-                    this.eui_bar.GetComponent<Renderer>()
-                    .material.SetColor(
-                        "_Color",
-                        this.gradient.Evaluate(this.eui / (float)this.relativ_eui)
+                    this.eui_bar.transform.localScale = new Vector3(
+                        2f,
+                        this.eui / (float)this.relativ_eui * 200,
+                        2f
                     );
+                    this.eui_bar.transform.position =
+                        this.house.transform.position
+                        + new Vector3(
+                            0,
+                            this.house.transform.localScale.y
+                                + this.eui / (float)this.relativ_eui * 200 / 2,
+                            0
+                        );
+                    this.eui_bar.GetComponent<Renderer>()
+                        .material.SetColor(
+                            "_Color",
+                            this.gradient.Evaluate(this.eui / (float)this.relativ_eui)
+                        );
                     this.eui_bar.transform.parent = this.house.transform;
                     this.eui_bar.tag = "eui";
                 }
             }
-            
-            
         }
 
         public void reset_color()
@@ -155,42 +163,31 @@ namespace CityRender
             if (this.house.activeSelf == true)
             {
                 this.house.GetComponent<Renderer>()
-                    .material.SetColor(
-                        "_Color",
-                        new Color(1, 1, 1, 1.0f)
-                    );
+                    .material.SetColor("_Color", new Color(1, 1, 1, 1.0f));
             }
             if (this.eui_bar.scene.IsValid())
             {
                 Destroy(this.eui_bar);
             }
-            
         }
 
         public void size_color()
         {
-            if (house_type.Contains("big")) {
+            if (house_type.Contains("big"))
+            {
                 this.house.GetComponent<Renderer>()
-                    .material.SetColor(
-                        "_Color",
-                        new Color(125,125,125)
-                    );
+                    .material.SetColor("_Color", new Color(125, 125, 125));
             }
-            if (house_type.Contains("middle")) {
+            if (house_type.Contains("middle"))
+            {
                 this.house.GetComponent<Renderer>()
-                    .material.SetColor(
-                        "_Color",
-                        new Color(66, 66, 66)
-                    );
+                    .material.SetColor("_Color", new Color(66, 66, 66));
             }
-            if (house_type.Contains("small")) {
+            if (house_type.Contains("small"))
+            {
                 this.house.GetComponent<Renderer>()
-                    .material.SetColor(
-                        "_Color",
-                        new Color(33, 33, 33)
-                    );
+                    .material.SetColor("_Color", new Color(33, 33, 33));
             }
         }
-
     }
 }
