@@ -110,10 +110,10 @@ public class UI : MonoBehaviour
         int i = 0;
         foreach (Year year in years)
         {
-            if (i == 2)
+            /* if (i == 2)
             {
                 break;
-            }
+            } */
             Vector2 init_pos = new(0, i * 1000);
 
             int j = 0;
