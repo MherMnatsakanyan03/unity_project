@@ -1,8 +1,6 @@
 # Arbeitsprotokoll
 
-Autoren: Mher Mnatsakanyan,
-
-Der Aufwand wurde gleichmäßig aufgeteilt, wobei jeder von uns einen ähnlichen Gesamtaufwand in der Umsetzung des Projekts hatte. Die Aufgaben wurden in der Gruppe besprochen und gemeinsam umgesetzt. Die Aufgabenverteilung war dabei nicht strikt festgelegt, sondern wurde je nach Bedarf und Interesse der Gruppenmitglieder angepasst.
+Autoren: Mher Mnatsakanyan, Nils Rommel
 
 ## Unity
 
